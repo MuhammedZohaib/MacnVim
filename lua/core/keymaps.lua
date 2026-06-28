@@ -30,10 +30,8 @@ map("n", "k", "gk", opts)
 -- <C-d> / <C-u> owned by neoscroll.nvim for smooth scroll.
 map("n", "n", "nzzzv", opts)
 map("n", "N", "Nzzzv", opts)
-map("n", "<C-h>", "<C-w>h", opts)
-map("n", "<C-j>", "<C-w>j", opts)
-map("n", "<C-k>", "<C-w>k", opts)
-map("n", "<C-l>", "<C-w>l", opts)
+-- <C-h/j/k/l> owned by vim-tmux-navigator (editing.lua): seamless nvim split
+-- <-> tmux pane navigation, with a wincmd fallback when not inside tmux.
 map("n", "<C-Up>", "<cmd>resize +2<CR>", opts)
 map("n", "<C-Down>", "<cmd>resize -2<CR>", opts)
 map("n", "<C-Left>", "<cmd>vertical resize -2<CR>", opts)
@@ -74,10 +72,6 @@ end, vim.tbl_extend("force", opts, { desc = "Format" }))
 map("n", "<leader>cF", function()
   require("conform").format({ async = false, lsp_format = "fallback", timeout_ms = 15000 })
 end, vim.tbl_extend("force", opts, { desc = "Format force" }))
-map("n", "<leader>ct", "<cmd>GhostTwinsScan<CR>", vim.tbl_extend("force", opts, { desc = "Ghost twins scan" }))
-map("n", "<leader>cT", "<cmd>GhostTwinsClear<CR>", vim.tbl_extend("force", opts, { desc = "Ghost twins clear" }))
-map("n", "<leader>cn", "<cmd>GhostTwinsNext<CR>", vim.tbl_extend("force", opts, { desc = "Next ghost twin" }))
-map("n", "<leader>cp", "<cmd>GhostTwinsPrev<CR>", vim.tbl_extend("force", opts, { desc = "Previous ghost twin" }))
 
 -- TypeScript tools
 map("n", "<leader>tsi", "<cmd>TSToolsAddMissingImports<CR>", vim.tbl_extend("force", opts, { desc = "TS add imports" }))
@@ -92,28 +86,16 @@ map("n", "<leader>gb", "<cmd>Gitsigns blame_line<CR>", vim.tbl_extend("force", o
 map("n", "]h", "<cmd>Gitsigns next_hunk<CR>", opts)
 map("n", "[h", "<cmd>Gitsigns prev_hunk<CR>", opts)
 
--- Terminal and stack tasks
+-- Terminal
 map("n", "<leader>tt", "<cmd>ToggleTerm direction=horizontal<CR>", vim.tbl_extend("force", opts, { desc = "Terminal horizontal" }))
 map("n", "<leader>tf", "<cmd>ToggleTerm direction=float<CR>", vim.tbl_extend("force", opts, { desc = "Terminal float" }))
 map("n", "<leader>tv", "<cmd>ToggleTerm direction=vertical<CR>", vim.tbl_extend("force", opts, { desc = "Terminal vertical" }))
-map("n", "<leader>tp", "<cmd>TermExec cmd=python3 direction=horizontal<CR>", vim.tbl_extend("force", opts, { desc = "Python REPL" }))
-map("n", "<leader>tn", "<cmd>TermExec cmd=node direction=horizontal<CR>", vim.tbl_extend("force", opts, { desc = "Node REPL" }))
-map("n", "<leader>tr", "<cmd>StackTasks<CR>", vim.tbl_extend("force", opts, { desc = "Pick task" }))
-map("n", "<leader>tl", "<cmd>StackLast<CR>", vim.tbl_extend("force", opts, { desc = "Last task" }))
-map("n", "<leader>tD", "<cmd>StackRun dev<CR>", vim.tbl_extend("force", opts, { desc = "Run dev" }))
-map("n", "<leader>tT", "<cmd>StackRun test<CR>", vim.tbl_extend("force", opts, { desc = "Run test" }))
-map("n", "<leader>tB", "<cmd>StackRun build<CR>", vim.tbl_extend("force", opts, { desc = "Run build" }))
-map("n", "<leader>tL", "<cmd>StackRun lint<CR>", vim.tbl_extend("force", opts, { desc = "Run lint" }))
+-- <leader>tp (IPython) / <leader>tn (Node) owned by toggleterm (terminal.lua).
 map("t", "<Esc>", [[<C-\><C-n>]], opts)
 
--- Routes, REST, env, diagnostics
-map("n", "<leader>rl", "<cmd>RouteLens<CR>", vim.tbl_extend("force", opts, { desc = "Route lens" }))
-map("n", "<leader>rq", "<cmd>RouteLensQuickfix<CR>", vim.tbl_extend("force", opts, { desc = "Routes to quickfix" }))
-map("n", "<leader>ee", "<cmd>EnvSentinel<CR>", vim.tbl_extend("force", opts, { desc = "Env sentinel" }))
-map("n", "<leader>ec", "<cmd>EnvSentinelClear<CR>", vim.tbl_extend("force", opts, { desc = "Clear env diagnostics" }))
+-- Diagnostics
 map("n", "<leader>xd", vim.diagnostic.open_float, vim.tbl_extend("force", opts, { desc = "Line diagnostics" }))
 map("n", "<leader>xx", "<cmd>Trouble diagnostics toggle<CR>", vim.tbl_extend("force", opts, { desc = "Diagnostics list" }))
-map("n", "<leader>xi", "<cmd>ProjectHealth<CR>", vim.tbl_extend("force", opts, { desc = "Project health" }))
 map("n", "[d", function()
   if vim.diagnostic.jump then
     vim.diagnostic.jump({ count = -1, float = true })
@@ -130,5 +112,6 @@ map("n", "]d", function()
 end, opts)
 
 -- Misc
+map("n", "<leader>P", "<cmd>QuickLook<CR>", vim.tbl_extend("force", opts, { desc = "Quick Look preview" }))
 map("n", "<leader>u", "<cmd>UndotreeToggle<CR>", vim.tbl_extend("force", opts, { desc = "Undo tree" }))
 map("n", "<leader>z", "<cmd>ZenMode<CR>", vim.tbl_extend("force", opts, { desc = "Zen mode" }))

@@ -3,6 +3,10 @@ return {
 		"akinsho/toggleterm.nvim",
 		version = "*",
 		cmd = { "ToggleTerm", "TermExec" },
+		keys = {
+			{ "<leader>tp", desc = "IPython REPL" },
+			{ "<leader>tn", desc = "Node REPL" },
+		},
 		opts = {
 			size = function(term)
 				if term.direction == "horizontal" then return 18

@@ -160,20 +160,57 @@ return {
         end,
       })
 
+      -- Resolve the Python interpreter to use for a given project root so
+      -- pyright/ruff see installed deps instead of reporting them missing.
+      -- Order: project-local venv  ->  activated $VIRTUAL_ENV  ->  system.
+      local function detect_python_path(root)
+        root = root or vim.fn.getcwd()
+        for _, dir in ipairs({ ".venv", "venv", "env" }) do
+          local candidate = root .. "/" .. dir .. "/bin/python"
+          if vim.fn.executable(candidate) == 1 then
+            return candidate
+          end
+        end
+        if vim.env.VIRTUAL_ENV and vim.env.VIRTUAL_ENV ~= "" then
+          local candidate = vim.env.VIRTUAL_ENV .. "/bin/python"
+          if vim.fn.executable(candidate) == 1 then
+            return candidate
+          end
+        end
+        local sys = vim.fn.exepath("python3")
+        if sys == "" then
+          sys = vim.fn.exepath("python")
+        end
+        return sys ~= "" and sys or "python3"
+      end
+
       local default = { capabilities = capabilities }
       local servers = {
         pyright = {
+          before_init = function(_, config)
+            local py = detect_python_path(config.root_dir)
+            config.settings = config.settings or {}
+            config.settings.python = vim.tbl_deep_extend("force", config.settings.python or {}, {
+              pythonPath = py,
+            })
+          end,
           settings = {
             python = {
               analysis = {
                 typeCheckingMode = "standard",
                 autoSearchPaths = true,
                 useLibraryCodeForTypes = true,
+                diagnosticMode = "openFilesOnly",
               },
             },
           },
         },
         ruff = {
+          before_init = function(_, config)
+            config.init_options = config.init_options or {}
+            config.init_options.settings = config.init_options.settings or {}
+            config.init_options.settings.interpreter = { detect_python_path(config.root_dir) }
+          end,
           init_options = {
             settings = {
               lineLength = 88,

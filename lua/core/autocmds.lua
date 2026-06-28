@@ -171,3 +171,48 @@ au("FileType", {
     vim.opt_local.textwidth = 100
   end,
 })
+
+-- Preview images / media / PDFs via macOS Quick Look instead of loading bytes.
+local quicklook_patterns = {
+  "*.png", "*.jpg", "*.jpeg", "*.gif", "*.webp", "*.bmp", "*.ico", "*.tiff", "*.heic", "*.svg",
+  "*.pdf",
+  "*.mp4", "*.mov", "*.mkv", "*.avi", "*.webm",
+  "*.mp3", "*.wav", "*.flac", "*.m4a", "*.ogg",
+}
+
+local function quicklook(path)
+  path = (path and path ~= "") and path or vim.fn.expand("%:p")
+  if path == "" or vim.fn.filereadable(path) == 0 then
+    vim.notify("Quick Look: no readable file", vim.log.levels.WARN)
+    return
+  end
+  if vim.fn.executable("qlmanage") == 0 then
+    vim.notify("Quick Look: qlmanage not found (macOS only)", vim.log.levels.ERROR)
+    return
+  end
+  vim.fn.jobstart({ "qlmanage", "-p", path }, { detach = true })
+end
+
+vim.api.nvim_create_user_command("QuickLook", function()
+  quicklook()
+end, { desc = "Preview current file in macOS Quick Look" })
+
+au("BufReadCmd", {
+  group = ag("QuickLookPreview", { clear = true }),
+  pattern = quicklook_patterns,
+  callback = function(args)
+    local path = vim.fn.fnamemodify(args.file, ":p")
+    quicklook(path)
+    -- Don't load the binary; show a placeholder buffer instead.
+    vim.bo[args.buf].buftype = "nofile"
+    vim.bo[args.buf].bufhidden = "wipe"
+    vim.bo[args.buf].swapfile = false
+    vim.bo[args.buf].modifiable = true
+    vim.api.nvim_buf_set_lines(args.buf, 0, -1, false, {
+      "  " .. vim.fn.fnamemodify(path, ":t") .. " opened in Quick Look.",
+      "",
+      "  <leader>P or :QuickLook  -> preview again",
+    })
+    vim.bo[args.buf].modifiable = false
+  end,
+})
