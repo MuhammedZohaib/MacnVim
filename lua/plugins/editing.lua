@@ -6,6 +6,26 @@ return {
     opts = {},
   },
 
+  -- Seamless <C-hjkl> movement across nvim splits and tmux panes. Falls back
+  -- to plain window navigation when not running inside tmux. Pairs with the
+  -- christoomey/vim-tmux-navigator entry already in ~/.tmux.conf.
+  {
+    "christoomey/vim-tmux-navigator",
+    cmd = {
+      "TmuxNavigateLeft",
+      "TmuxNavigateDown",
+      "TmuxNavigateUp",
+      "TmuxNavigateRight",
+      "TmuxNavigatePrevious",
+    },
+    keys = {
+      { "<C-h>", "<cmd>TmuxNavigateLeft<CR>", desc = "Window/pane left" },
+      { "<C-j>", "<cmd>TmuxNavigateDown<CR>", desc = "Window/pane down" },
+      { "<C-k>", "<cmd>TmuxNavigateUp<CR>", desc = "Window/pane up" },
+      { "<C-l>", "<cmd>TmuxNavigateRight<CR>", desc = "Window/pane right" },
+    },
+  },
+
   {
     "numToStr/Comment.nvim",
     event = "BufReadPost",
@@ -47,16 +67,15 @@ return {
       spec = {
         { "<leader>b", group = "Buffers" },
         { "<leader>c", group = "Code" },
-        { "<leader>e", group = "Env/Explorer" },
         { "<leader>f", group = "Find" },
         { "<leader>g", group = "Git" },
         { "<leader>h", group = "Harpoon" },
-        { "<leader>m", group = "Markdown" },
+        { "<leader>j", group = "Jupyter" },
         { "<leader>n", group = "Packages" },
         { "<leader>p", group = "Persistence/Paste" },
-        { "<leader>r", group = "Routes/REST" },
+        { "<leader>r", group = "REST" },
         { "<leader>s", group = "Splits/Search" },
-        { "<leader>t", group = "Terminal/Tasks/TypeScript" },
+        { "<leader>t", group = "Terminal/TypeScript" },
         { "<leader>ts", group = "TypeScript" },
         { "<leader>x", group = "Diagnostics" },
       },
@@ -100,12 +119,4 @@ return {
   },
 
   { "kevinhwang91/nvim-bqf", event = "FileType qf" },
-
-  {
-    "iamcco/markdown-preview.nvim",
-    cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
-    build = "cd app && npm install",
-    ft = { "markdown" },
-    keys = { { "<leader>mp", "<cmd>MarkdownPreviewToggle<CR>", desc = "Markdown preview" } },
-  },
 }

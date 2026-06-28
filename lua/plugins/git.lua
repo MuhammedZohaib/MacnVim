@@ -65,6 +65,19 @@ return {
     dependencies = { "nvim-lua/plenary.nvim" },
     cmd = "LazyGit",
     keys = { { "<leader>gg", "<cmd>LazyGit<CR>", desc = "LazyGit" } },
+    config = function()
+      -- The global terminal-mode <Esc> remap (keymaps.lua) exits terminal mode
+      -- and traps you in the lazygit buffer. Let <Esc> reach lazygit instead so
+      -- it navigates/quits normally.
+      vim.api.nvim_create_autocmd("TermOpen", {
+        group = vim.api.nvim_create_augroup("LazyGitEsc", { clear = true }),
+        callback = function(args)
+          if vim.api.nvim_buf_get_name(args.buf):match("lazygit") then
+            vim.keymap.set("t", "<Esc>", "<Esc>", { buffer = args.buf, desc = "Pass Esc to lazygit" })
+          end
+        end,
+      })
+    end,
   },
 
   {

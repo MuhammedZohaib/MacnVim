@@ -127,7 +127,6 @@ return {
         dashboard.button("n", "   New file",           "<cmd>enew<CR>"),
         dashboard.button("e", "   Explorer",           "<cmd>Neotree toggle<CR>"),
         dashboard.button("s", "   Restore session",    "<cmd>lua require('persistence').load()<CR>"),
-        dashboard.button("h", "   Project health",     "<cmd>ProjectHealth<CR>"),
         dashboard.button("l", "󰒲   Lazy",                "<cmd>Lazy<CR>"),
         dashboard.button("m", "   Mason",               "<cmd>Mason<CR>"),
         dashboard.button("c", "   Config",             "<cmd>edit ~/.config/nvim/init.lua<CR>"),
