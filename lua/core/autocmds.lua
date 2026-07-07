@@ -164,11 +164,20 @@ au("FileType", {
 au("FileType", {
   group = ag("MarkdownSettings", { clear = true }),
   pattern = { "markdown", "gitcommit" },
-  callback = function()
+  callback = function(args)
+    pcall(vim.treesitter.stop, args.buf)
+    vim.bo[args.buf].syntax = "markdown"
     vim.opt_local.wrap = true
     vim.opt_local.linebreak = true
     vim.opt_local.spell = true
     vim.opt_local.textwidth = 100
+
+    vim.schedule(function()
+      if vim.api.nvim_buf_is_valid(args.buf) then
+        pcall(vim.treesitter.stop, args.buf)
+        vim.bo[args.buf].syntax = "markdown"
+      end
+    end)
   end,
 })
 

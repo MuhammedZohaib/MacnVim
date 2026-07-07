@@ -5,7 +5,7 @@ A focused Neovim config for TypeScript/JavaScript, Python, shell, Markdown, Dock
 ## Stack
 
 - Plugin manager: lazy.nvim
-- Theme: gruvbox-material
+- Theme: hearth
 - Search: fzf-lua + ripgrep
 - LSP: TypeScript tools, ESLint, Pyright, Ruff, Bash, Docker, JSON, YAML, HTML, CSS, Tailwind
 - Formatting: conform.nvim with Prettier/Prettierd, Ruff, Shfmt, Stylua
