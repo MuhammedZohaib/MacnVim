@@ -105,13 +105,7 @@ map("n", "<leader>gg", function() Snacks.lazygit() end, vim.tbl_extend("force", 
 map("n", "<leader>xd", vim.diagnostic.open_float, vim.tbl_extend("force", opts, { desc = "Line diagnostics" }))
 -- float=false: tiny-inline-diagnostic already shows the message at the cursor
 local function diag_jump(count, severity)
-  if vim.diagnostic.jump then
-    vim.diagnostic.jump({ count = count, float = false, severity = severity })
-  elseif count < 0 then
-    vim.diagnostic.goto_prev({ severity = severity })
-  else
-    vim.diagnostic.goto_next({ severity = severity })
-  end
+  vim.diagnostic.jump({ count = count, float = false, severity = severity })
 end
 map("n", "[d", function() diag_jump(-1) end, vim.tbl_extend("force", opts, { desc = "Previous diagnostic" }))
 map("n", "]d", function() diag_jump(1) end, vim.tbl_extend("force", opts, { desc = "Next diagnostic" }))

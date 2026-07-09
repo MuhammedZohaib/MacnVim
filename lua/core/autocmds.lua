@@ -99,7 +99,9 @@ local function open_neotree(dir)
     pcall(lazy.load, { plugins = { "neo-tree.nvim" } })
   end
 
-  return pcall(vim.cmd, "Neotree current dir=" .. escaped)
+  return pcall(function()
+    vim.cmd("Neotree current dir=" .. escaped)
+  end)
 end
 
 au("VimEnter", {
@@ -109,7 +111,7 @@ au("VimEnter", {
     local argc = vim.fn.argc(-1)
 
     if argc == 1 then
-      local arg0 = vim.fn.fnamemodify(vim.fn.argv(0), ":p")
+      local arg0 = vim.fn.fnamemodify(vim.fn.argv(0) --[[@as string]], ":p")
       if is_directory(arg0) then
         open_neotree(arg0)
       end

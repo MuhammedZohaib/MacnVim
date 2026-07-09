@@ -38,7 +38,6 @@ return {
         "cssls",
         "tailwindcss",
         "jsonls",
-        "yamlls",
         "dockerls",
         "docker_compose_language_service",
         "lua_ls",
@@ -87,6 +86,7 @@ return {
         opts = {
           library = {
             { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+            { path = "snacks.nvim", words = { "Snacks" } },
           },
         },
       },
@@ -261,17 +261,6 @@ return {
           },
           settings = {
             workingDirectories = { mode = "auto" },
-          },
-        },
-        yamlls = {
-          settings = {
-            yaml = {
-              keyOrdering = false,
-              schemas = {
-                ["https://json.schemastore.org/github-workflow.json"] = ".github/workflows/*.{yml,yaml}",
-                ["https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json"] = "docker-compose*.{yml,yaml}",
-              },
-            },
           },
         },
         jsonls = {},
