@@ -4,5 +4,9 @@
   // Allow inline HTML (badges, <br>, details blocks in READMEs).
   "MD033": false,
   // Don't police table pipe alignment — hand-edited tables drift.
-  "MD060": false
+  "MD060": false,
+  // Italic caption lines under images are intentional, not headings.
+  "MD036": false,
+  // README opens with a centered <div> hero, not a bare h1.
+  "MD041": false
 }
