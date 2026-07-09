@@ -1,163 +1,139 @@
-# MacnVim/
+# Macnvim
 
-<a href="https://dotfyle.com/MuhammedZohaib/macnvim"><img src="https://dotfyle.com/MuhammedZohaib/macnvim/badges/plugins?style=flat" /></a>
-<a href="https://dotfyle.com/MuhammedZohaib/macnvim"><img src="https://dotfyle.com/MuhammedZohaib/macnvim/badges/leaderkey?style=flat" /></a>
-<a href="https://dotfyle.com/MuhammedZohaib/macnvim"><img src="https://dotfyle.com/MuhammedZohaib/macnvim/badges/plugin-manager?style=flat" /></a>
+A fast, modern Neovim configuration for full-stack development — TypeScript/JavaScript, Python, shell, Docker, Markdown, and Jupyter notebooks. Built on native Neovim APIs (0.11+ LSP, treesitter main branch) with a curated plugin set instead of a kitchen-sink distro.
 
+![Neovim 0.11+](https://img.shields.io/badge/Neovim-0.11%2B-57A143?logo=neovim&logoColor=white)
+![Lua](https://img.shields.io/badge/Made%20with-Lua-2C2D72?logo=lua&logoColor=white)
 
-## Install Instructions
+## Highlights
 
- > Install requires Neovim 0.9+. Always review the code before installing a configuration.
+- **Native-first**: `vim.lsp.config` / `vim.lsp.enable` (no legacy lspconfig chains), nvim-treesitter main branch, native `gc` commenting
+- **Fast completion**: [blink.cmp](https://github.com/saghen/blink.cmp) + LuaSnip, LSP/snippets/path/buffer sources, cmdline completion
+- **Clean diagnostics**: [tiny-inline-diagnostic](https://github.com/rachartier/tiny-inline-diagnostic.nvim) — boxed message on the cursor line only, wrapped so it never runs off-screen; gutter signs elsewhere
+- **Picker-centric**: [fzf-lua](https://github.com/ibhagwan/fzf-lua) for files/grep/symbols/diagnostics, [neo-tree](https://github.com/nvim-neo-tree/neo-tree.nvim) sidebar + [oil.nvim](https://github.com/stevearc/oil.nvim) for edit-dirs-as-buffers
+- **One UI toolkit**: [snacks.nvim](https://github.com/folke/snacks.nvim) dashboard, notifier, bigfile handling, scratch buffers
+- **[Kanagawa](https://github.com/rebelot/kanagawa.nvim) Dragon** theme
+- **Format on save**: conform.nvim (prettier/stylua/ruff/shfmt) with project-config-wins fallbacks, nvim-lint (shellcheck/hadolint/markdownlint)
+- **Git suite**: gitsigns, diffview, LazyGit, merge-conflict helpers
+- **Jupyter workflow**: `.ipynb` editing via jupytext + iron.nvim REPL + cell navigation
+- **Lazy-loaded**: nearly every plugin loads on demand; startup stays snappy
 
-Clone the repository and install the plugins:
+## Requirements
 
-```sh
-git clone git@github.com:MuhammedZohaib/MacnVim ~/.config/MuhammedZohaib/MacnVim
+| Tool | Why |
+|---|---|
+| Neovim **0.11+** (0.12 recommended) | native LSP API, treesitter main branch |
+| git, curl | plugin installs |
+| [ripgrep](https://github.com/BurntSushi/ripgrep) | live grep, project search |
+| a [Nerd Font](https://www.nerdfonts.com/) | icons everywhere |
+| Node.js + npm | TS/JS language servers |
+| Python 3 + pip | pyright/ruff, Jupyter workflow |
+| make, tree-sitter CLI | parser + native module builds |
+| [lazygit](https://github.com/jesseduffield/lazygit) *(optional)* | `<leader>gg` git TUI |
+| [fd](https://github.com/sharkdp/fd) *(optional)* | faster file finding |
+
+macOS one-liner:
+
+```bash
+brew install neovim ripgrep fd node python tree-sitter lazygit && \
+brew install --cask font-jetbrains-mono-nerd-font
 ```
 
-Open Neovim with this config:
+LSP servers, formatters, and linters are installed automatically through [Mason](https://github.com/williamboman/mason.nvim) on first launch.
 
-```sh
-NVIM_APPNAME=MuhammedZohaib/MacnVim/ nvim
+## Install
+
+Back up any existing config first:
+
+```bash
+mv ~/.config/nvim ~/.config/nvim.bak
+mv ~/.local/share/nvim ~/.local/share/nvim.bak
 ```
 
-## Plugins
+Clone and launch:
 
-### code-runner
+```bash
+git clone https://github.com/MuhammedZohaib/Macnvim.git ~/.config/nvim
+nvim
+```
 
-+ [Vigemus/iron.nvim](https://dotfyle.com/plugins/Vigemus/iron.nvim)
-### color
+lazy.nvim bootstraps itself, installs all plugins, and Mason pulls the language toolchain. Give the first launch a minute, then restart.
 
-+ [NvChad/nvim-colorizer.lua](https://dotfyle.com/plugins/NvChad/nvim-colorizer.lua)
-### comment
+**Try it without touching your config** (any Neovim 0.9+):
 
-+ [echasnovski/mini.comment](https://dotfyle.com/plugins/echasnovski/mini.comment)
-+ [folke/todo-comments.nvim](https://dotfyle.com/plugins/folke/todo-comments.nvim)
-+ [numToStr/Comment.nvim](https://dotfyle.com/plugins/numToStr/Comment.nvim)
-### completion
+```bash
+git clone https://github.com/MuhammedZohaib/Macnvim.git ~/.config/macnvim
+NVIM_APPNAME=macnvim nvim
+```
 
-+ [hrsh7th/nvim-cmp](https://dotfyle.com/plugins/hrsh7th/nvim-cmp)
-### dependency-management
+## Structure
 
-+ [vuki656/package-info.nvim](https://dotfyle.com/plugins/vuki656/package-info.nvim)
-### diagnostics
+```text
+~/.config/nvim/
+├── init.lua                 # entry point — loads core modules, bootstraps lazy.nvim
+├── lua/core/
+│   ├── options.lua          # editor settings (leader = Space)
+│   ├── keymaps.lua          # global keybindings
+│   ├── autocmds.lua         # autocommands (yank highlight, trim whitespace, ...)
+│   └── lazy.lua             # plugin manager bootstrap
+└── lua/plugins/             # one file per concern, auto-imported
+    ├── colorscheme.lua      # kanagawa (dragon)
+    ├── lsp.lua              # servers, diagnostics, Mason, Trouble
+    ├── completion.lua       # blink.cmp + LuaSnip
+    ├── treesitter.lua       # parsers, textobjects, autotag
+    ├── formatting.lua       # conform + nvim-lint
+    ├── fzf.lua              # fzf-lua picker
+    ├── neo-tree.lua         # explorer + oil.nvim
+    ├── git.lua              # gitsigns, diffview, lazygit
+    ├── editing.lua          # surround, flash, grug-far, which-key, folds
+    ├── ui.lua               # snacks, lualine, bufferline, noice, ...
+    ├── fullstack.lua        # typescript-tools, harpoon, kulala, aerial
+    ├── terminal.lua         # toggleterm + REPLs
+    ├── jupyter.lua          # jupytext, iron.nvim, cell navigation
+    └── insights.lua         # scrollbar
+```
 
-+ [folke/trouble.nvim](https://dotfyle.com/plugins/folke/trouble.nvim)
-### editing-support
+## Languages out of the box
 
-+ [windwp/nvim-autopairs](https://dotfyle.com/plugins/windwp/nvim-autopairs)
-+ [windwp/nvim-ts-autotag](https://dotfyle.com/plugins/windwp/nvim-ts-autotag)
-+ [echasnovski/mini.ai](https://dotfyle.com/plugins/echasnovski/mini.ai)
-+ [folke/zen-mode.nvim](https://dotfyle.com/plugins/folke/zen-mode.nvim)
-### file-explorer
+TypeScript/JavaScript (typescript-tools + ESLint), Python (pyright + ruff), Lua, Bash, HTML/CSS/Tailwind, JSON, YAML, Docker/Compose, Markdown. Opening a filetype that needs an uninstalled server prompts a one-key Mason install (Go, Rust, C/C++, Svelte, Vue, Ruby, PHP, Zig, Terraform, Prisma, GraphQL, Elixir, Kotlin, and more).
 
-+ [nvim-neo-tree/neo-tree.nvim](https://dotfyle.com/plugins/nvim-neo-tree/neo-tree.nvim)
-### folding
+## Usage
 
-+ [kevinhwang91/nvim-ufo](https://dotfyle.com/plugins/kevinhwang91/nvim-ufo)
-### formatting
+Leader is **Space**. Press it and pause — which-key shows every binding. Full keymap reference: **[usage.md](./usage.md)**.
 
-+ [stevearc/conform.nvim](https://dotfyle.com/plugins/stevearc/conform.nvim)
-### fuzzy-finder
+The ten to learn first:
 
-+ [ibhagwan/fzf-lua](https://dotfyle.com/plugins/ibhagwan/fzf-lua)
-### git
+| Key | Action |
+|---|---|
+| `<leader>ff` / `<leader>fg` | find files / grep project |
+| `<leader>e` | file explorer |
+| `-` | edit parent directory (oil) |
+| `gd` / `K` | definition / hover docs |
+| `<leader>ca` / `<leader>rn` | code action / rename |
+| `<leader>gg` | LazyGit |
+| `<leader>cf` | format buffer |
+| `]d` `[d` / `]e` `[e` | next/prev diagnostic / error |
+| `s` | flash jump anywhere on screen |
 
-+ [kdheepak/lazygit.nvim](https://dotfyle.com/plugins/kdheepak/lazygit.nvim)
-+ [sindrets/diffview.nvim](https://dotfyle.com/plugins/sindrets/diffview.nvim)
-+ [akinsho/git-conflict.nvim](https://dotfyle.com/plugins/akinsho/git-conflict.nvim)
-+ [lewis6991/gitsigns.nvim](https://dotfyle.com/plugins/lewis6991/gitsigns.nvim)
-### icon
+## Customization
 
-+ [nvim-tree/nvim-web-devicons](https://dotfyle.com/plugins/nvim-tree/nvim-web-devicons)
-### indent
+- Editor behavior: `lua/core/options.lua`
+- Add/remove plugins: drop a spec file in `lua/plugins/` — lazy.nvim picks it up
+- Line length: `colorcolumn`/`textwidth` in `options.lua`, formatter widths in `formatting.lua` (project configs always win)
+- Theme: swap the spec in `lua/plugins/colorscheme.lua`
 
-+ [lukas-reineke/indent-blankline.nvim](https://dotfyle.com/plugins/lukas-reineke/indent-blankline.nvim)
-### keybinding
+## Troubleshooting
 
-+ [folke/which-key.nvim](https://dotfyle.com/plugins/folke/which-key.nvim)
-### lsp
+```vim
+:checkhealth          " full health report
+:Lazy                 " plugin states, sync, profile startup
+:Mason                " language tool installs
+:ConformInfo          " which formatter runs for this buffer
+:checkhealth vim.lsp  " attached servers
+```
 
-+ [mfussenegger/nvim-lint](https://dotfyle.com/plugins/mfussenegger/nvim-lint)
-+ [stevearc/aerial.nvim](https://dotfyle.com/plugins/stevearc/aerial.nvim)
-+ [onsails/lspkind.nvim](https://dotfyle.com/plugins/onsails/lspkind.nvim)
-+ [neovim/nvim-lspconfig](https://dotfyle.com/plugins/neovim/nvim-lspconfig)
-### lsp-installer
+Cold smoke test from a shell — expect empty output:
 
-+ [williamboman/mason.nvim](https://dotfyle.com/plugins/williamboman/mason.nvim)
-### marks
-
-+ [ThePrimeagen/harpoon](https://dotfyle.com/plugins/ThePrimeagen/harpoon)
-### motion
-
-+ [folke/flash.nvim](https://dotfyle.com/plugins/folke/flash.nvim)
-### nvim-dev
-
-+ [nvim-lua/plenary.nvim](https://dotfyle.com/plugins/nvim-lua/plenary.nvim)
-+ [MunifTanjim/nui.nvim](https://dotfyle.com/plugins/MunifTanjim/nui.nvim)
-+ [folke/lazydev.nvim](https://dotfyle.com/plugins/folke/lazydev.nvim)
-### plugin-manager
-
-+ [folke/lazy.nvim](https://dotfyle.com/plugins/folke/lazy.nvim)
-### quickfix
-
-+ [kevinhwang91/nvim-bqf](https://dotfyle.com/plugins/kevinhwang91/nvim-bqf)
-### scrollbar
-
-+ [petertriho/nvim-scrollbar](https://dotfyle.com/plugins/petertriho/nvim-scrollbar)
-### scrolling
-
-+ [karb94/neoscroll.nvim](https://dotfyle.com/plugins/karb94/neoscroll.nvim)
-### search
-
-+ [nvim-pack/nvim-spectre](https://dotfyle.com/plugins/nvim-pack/nvim-spectre)
-### session
-
-+ [folke/persistence.nvim](https://dotfyle.com/plugins/folke/persistence.nvim)
-### snippet
-
-+ [rafamadriz/friendly-snippets](https://dotfyle.com/plugins/rafamadriz/friendly-snippets)
-+ [L3MON4D3/LuaSnip](https://dotfyle.com/plugins/L3MON4D3/LuaSnip)
-### startup
-
-+ [goolord/alpha-nvim](https://dotfyle.com/plugins/goolord/alpha-nvim)
-### statusline
-
-+ [nvim-lualine/lualine.nvim](https://dotfyle.com/plugins/nvim-lualine/lualine.nvim)
-### syntax
-
-+ [nvim-treesitter/nvim-treesitter-textobjects](https://dotfyle.com/plugins/nvim-treesitter/nvim-treesitter-textobjects)
-+ [kylechui/nvim-surround](https://dotfyle.com/plugins/kylechui/nvim-surround)
-+ [nvim-treesitter/nvim-treesitter](https://dotfyle.com/plugins/nvim-treesitter/nvim-treesitter)
-### tabline
-
-+ [akinsho/bufferline.nvim](https://dotfyle.com/plugins/akinsho/bufferline.nvim)
-### terminal-integration
-
-+ [akinsho/toggleterm.nvim](https://dotfyle.com/plugins/akinsho/toggleterm.nvim)
-### utility
-
-+ [stevearc/dressing.nvim](https://dotfyle.com/plugins/stevearc/dressing.nvim)
-+ [GCBallesteros/NotebookNavigator.nvim](https://dotfyle.com/plugins/GCBallesteros/NotebookNavigator.nvim)
-+ [rcarriga/nvim-notify](https://dotfyle.com/plugins/rcarriga/nvim-notify)
-+ [folke/noice.nvim](https://dotfyle.com/plugins/folke/noice.nvim)
-+ [GCBallesteros/jupytext.nvim](https://dotfyle.com/plugins/GCBallesteros/jupytext.nvim)
-### web-development
-
-+ [mistweaverco/kulala.nvim](https://dotfyle.com/plugins/mistweaverco/kulala.nvim)
-## Language Servers
-
-+ bashls
-+ cssls
-+ docker_compose_language_service
-+ dockerls
-+ eslint
-+ html
-+ jsonls
-+ lua_ls
-+ pyright
-+ tailwindcss
-+ yamlls
-
-
- This readme was generated by [Dotfyle](https://dotfyle.com)
+```bash
+nvim --headless +qa 2>&1 | grep -iE "error|deprec|fail"
+```
