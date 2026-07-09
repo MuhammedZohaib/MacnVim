@@ -16,7 +16,7 @@ opt.number = true
 opt.relativenumber = true
 opt.cursorline = true
 opt.signcolumn = "yes"
-opt.colorcolumn = "100"
+opt.colorcolumn = "120"
 opt.scrolloff = 8
 opt.sidescrolloff = 8
 opt.termguicolors = true
@@ -40,7 +40,7 @@ opt.softtabstop = 2
 opt.smartindent = true
 opt.wrap = false
 opt.breakindent = true
-opt.textwidth = 100
+opt.textwidth = 120
 opt.list = true
 opt.listchars = { tab = "> ", trail = "-", extends = ">", precedes = "<", nbsp = "+" }
 opt.fillchars = { eob = " ", fold = " ", foldopen = "-", foldsep = " ", foldclose = "+" }

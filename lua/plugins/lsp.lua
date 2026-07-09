@@ -1,5 +1,22 @@
 return {
   {
+    "rachartier/tiny-inline-diagnostic.nvim",
+    event = "VeryLazy",
+    priority = 1000,
+    opts = {
+      preset = "modern",
+      options = {
+        -- multilines renders single-line overlays on non-cursor lines that can't
+        -- wrap and run off-screen — keep diagnostics on the cursor line only.
+        multilines = { enabled = false },
+        show_all_diags_on_cursorline = true,
+        overflow = { mode = "wrap", padding = 4 },
+        break_line = { enabled = true, after = 80 }, -- hard-break long messages so they never run off-screen
+      },
+    },
+  },
+
+  {
     "williamboman/mason.nvim",
     cmd = "Mason",
     opts = {
@@ -53,6 +70,7 @@ return {
       run_on_start = true,
       start_delay = 2500,
       debounce_hours = 24,
+      auto_update = true, -- also update outdated tools, same 24h debounce
     },
   },
 
@@ -62,7 +80,7 @@ return {
     dependencies = {
       "williamboman/mason.nvim",
       "williamboman/mason-lspconfig.nvim",
-      "hrsh7th/cmp-nvim-lsp",
+      "saghen/blink.cmp",
       {
         "folke/lazydev.nvim",
         ft = "lua",
@@ -74,17 +92,27 @@ return {
       },
     },
     config = function()
-      local lspconfig = require("lspconfig")
-      local util = require("lspconfig.util")
-      local capabilities = require("cmp_nvim_lsp").default_capabilities()
+      local capabilities = require("blink.cmp").get_lsp_capabilities()
+      local severity_names = {
+        [vim.diagnostic.severity.ERROR] = "ERROR",
+        [vim.diagnostic.severity.WARN] = "WARN",
+        [vim.diagnostic.severity.INFO] = "INFO",
+        [vim.diagnostic.severity.HINT] = "HINT",
+      }
+
+      local function format_diagnostic(diagnostic)
+        local parts = { severity_names[diagnostic.severity] or "DIAGNOSTIC" }
+        if diagnostic.source and diagnostic.source ~= "" then
+          table.insert(parts, diagnostic.source)
+        end
+        if diagnostic.code and diagnostic.code ~= "" then
+          table.insert(parts, "[" .. tostring(diagnostic.code) .. "]")
+        end
+        return table.concat(parts, " ") .. ": " .. diagnostic.message
+      end
 
       vim.diagnostic.config({
-        virtual_text = {
-          spacing = 4,
-          source = "if_many",
-          prefix = ">",
-          severity = { min = vim.diagnostic.severity.ERROR },
-        },
+        virtual_text = false, -- rendered by tiny-inline-diagnostic on cursor line only
         signs = {
           severity = { min = vim.diagnostic.severity.HINT },
           text = {
@@ -94,15 +122,17 @@ return {
             [vim.diagnostic.severity.HINT] = "H ",
           },
         },
+        virtual_lines = false,
         underline = true,
         update_in_insert = false,
         severity_sort = true,
         float = {
           focusable = true,
           border = "rounded",
-          source = "always",
+          source = true,
           header = "",
           prefix = "",
+          format = format_diagnostic,
         },
       })
 
@@ -117,7 +147,7 @@ return {
       end
 
       vim.api.nvim_create_autocmd("LspAttach", {
-        group = vim.api.nvim_create_augroup("d4c_lsp_attach", { clear = true }),
+        group = vim.api.nvim_create_augroup("macnvim_lsp_attach", { clear = true }),
         callback = function(event)
           local client = vim.lsp.get_client_by_id(event.data.client_id)
           local map = function(keys, func, desc)
@@ -140,23 +170,10 @@ return {
           map("K", vim.lsp.buf.hover, "Hover")
           map("gK", vim.lsp.buf.signature_help, "Signature help")
 
-          if vim.lsp.inlay_hint then
-            map("<leader>ih", function()
-              local enabled = false
-              local ok_enabled, result = pcall(vim.lsp.inlay_hint.is_enabled, { bufnr = event.buf })
-              if ok_enabled then
-                enabled = result
-              else
-                local ok_old, old_result = pcall(vim.lsp.inlay_hint.is_enabled, event.buf)
-                enabled = ok_old and old_result or false
-              end
-
-              local ok_new = pcall(vim.lsp.inlay_hint.enable, not enabled, { bufnr = event.buf })
-              if not ok_new then
-                pcall(vim.lsp.inlay_hint.enable, event.buf, not enabled)
-              end
-            end, "Toggle inlay hints")
-          end
+          map("<leader>ih", function()
+            local filter = { bufnr = event.buf }
+            vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled(filter), filter)
+          end, "Toggle inlay hints")
         end,
       })
 
@@ -213,7 +230,8 @@ return {
           end,
           init_options = {
             settings = {
-              lineLength = 88,
+              -- Editor fallback; project ruff.toml/pyproject wins in ruff server.
+              lineLength = 80,
             },
           },
         },
@@ -227,7 +245,10 @@ return {
           },
         },
         eslint = {
-          root_dir = util.root_pattern(
+          -- Native vim.lsp.config root detection; the old util.root_pattern
+          -- callback had the wrong signature for vim.lsp.config and broke
+          -- eslint root resolution silently.
+          root_markers = {
             "eslint.config.js",
             "eslint.config.mjs",
             "eslint.config.cjs",
@@ -236,8 +257,8 @@ return {
             ".eslintrc.js",
             ".eslintrc.cjs",
             ".eslintrc.json",
-            "package.json"
-          ),
+            "package.json",
+          },
           settings = {
             workingDirectories = { mode = "auto" },
           },
@@ -262,16 +283,93 @@ return {
         bashls = {},
       }
 
-      local use_native_lsp = vim.lsp.config ~= nil and vim.lsp.enable ~= nil
+      -- Native LSP API (0.11+); nvim-lspconfig supplies base configs in lsp/.
+      vim.lsp.config("*", { capabilities = capabilities }) -- incl. auto-installed servers
       for server_name, server_opts in pairs(servers) do
         local opts = vim.tbl_deep_extend("force", {}, default, server_opts or {})
-        if use_native_lsp then
-          vim.lsp.config(server_name, opts)
-          vim.lsp.enable(server_name)
-        elseif lspconfig[server_name] then
-          lspconfig[server_name].setup(opts)
-        end
+        vim.lsp.config(server_name, opts)
+        vim.lsp.enable(server_name)
       end
+
+      -- Auto-offer LSP install for languages outside the core stack.
+      -- Opening a filetype below with its server missing prompts once per
+      -- session; on confirm, mason installs it and the server is enabled.
+      local extra_servers = {
+        go = { server = "gopls", pkg = "gopls" },
+        rust = { server = "rust_analyzer", pkg = "rust-analyzer" },
+        c = { server = "clangd", pkg = "clangd" },
+        cpp = { server = "clangd", pkg = "clangd" },
+        svelte = { server = "svelte", pkg = "svelte-language-server" },
+        vue = { server = "vue_ls", pkg = "vue-language-server" },
+        ruby = { server = "ruby_lsp", pkg = "ruby-lsp" },
+        php = { server = "intelephense", pkg = "intelephense" },
+        zig = { server = "zls", pkg = "zls" },
+        terraform = { server = "terraformls", pkg = "terraform-ls" },
+        prisma = { server = "prismals", pkg = "prisma-language-server" },
+        graphql = { server = "graphql", pkg = "graphql-language-service-cli" },
+        elixir = { server = "elixirls", pkg = "elixir-ls" },
+        kotlin = { server = "kotlin_language_server", pkg = "kotlin-language-server" },
+        toml = { server = "taplo", pkg = "taplo" },
+      }
+
+      local prompted = {}
+      vim.api.nvim_create_autocmd("FileType", {
+        group = vim.api.nvim_create_augroup("LspAutoInstall", { clear = true }),
+        callback = function(args)
+          local entry = extra_servers[args.match]
+          if not entry or vim.bo[args.buf].buftype ~= "" then
+            return
+          end
+
+          -- mason.nvim already loaded (dependency of mason-lspconfig).
+          local ok, registry = pcall(require, "mason-registry")
+          if not ok then
+            return
+          end
+          local pkg_ok, pkg = pcall(registry.get_package, entry.pkg)
+          if not pkg_ok then
+            return
+          end
+
+          if pkg:is_installed() then
+            vim.lsp.enable(entry.server) -- idempotent
+            return
+          end
+          if prompted[entry.server] then
+            return
+          end
+          prompted[entry.server] = true -- ask once per session
+
+          vim.defer_fn(function()
+            vim.ui.select(
+              { "Install", "Not now" },
+              { prompt = ("LSP missing: install %s for %s files?"):format(entry.pkg, args.match) },
+              function(choice)
+                if choice ~= "Install" then
+                  return
+                end
+                vim.notify("Mason: installing " .. entry.pkg .. "…", vim.log.levels.INFO)
+                local handle_ok, handle = pcall(pkg.install, pkg)
+                if not handle_ok then
+                  vim.notify("Mason: failed to start install for " .. entry.pkg, vim.log.levels.ERROR)
+                  return
+                end
+                handle:once(
+                  "closed",
+                  vim.schedule_wrap(function()
+                    if pkg:is_installed() then
+                      vim.lsp.enable(entry.server)
+                      vim.notify(entry.pkg .. " installed — LSP active", vim.log.levels.INFO)
+                    else
+                      vim.notify(entry.pkg .. " install failed; see :Mason", vim.log.levels.ERROR)
+                    end
+                  end)
+                )
+              end
+            )
+          end, 150)
+        end,
+      })
     end,
   },
 

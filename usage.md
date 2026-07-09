@@ -1,4 +1,6 @@
-Leader = **Space**. Localleader = **\\**.
+# Macnvim — Keymap Reference
+
+Leader = **Space**. Localleader = **\\**. Press `<Space>` and pause — which-key shows everything. Searchable list: `<leader>fk`.
 
 ## Files & Search (fzf-lua)
 
@@ -16,9 +18,8 @@ Leader = **Space**. Localleader = **\\**.
 | `<leader>fs` | Document symbols                         |
 | `<leader>fS` | Workspace symbols                        |
 | `<leader>ft` | Todo comments                            |
-| `<leader>fo` | Code outline (aerial)                    |
-| `<leader>S`  | Spectre: search/replace project-wide     |
-| `<leader>sw` | Spectre: replace word under cursor       |
+| `<leader>S`  | Search/replace project-wide (grug-far)   |
+| `<leader>sw` | Replace word under cursor (grug-far)     |
 
 ## Motion & Jumping
 
@@ -26,12 +27,13 @@ Leader = **Space**. Localleader = **\\**.
 | ------------------ | ----------------------------------------------------- |
 | `s`                | **Flash jump** — 2-char label jump anywhere on screen |
 | `S`                | Flash treesitter node jump                            |
-| `<C-d>` / `<C-u>`  | **Smooth half-page scroll** (neoscroll)               |
+| `<C-d>` / `<C-u>`  | Smooth half-page scroll (neoscroll)                   |
 | `<C-f>` / `<C-b>`  | Smooth full-page scroll                               |
 | `zz` / `zt` / `zb` | Smooth center / top / bottom recenter                 |
 | `j` / `k`          | Down/up by visual line (wrapping-safe)                |
 | `n` / `N`          | Next/prev search result, centered                     |
 | `[d` / `]d`        | Prev/next diagnostic                                  |
+| `[e` / `]e`        | Prev/next **error** (skips warnings)                  |
 | `[h` / `]h`        | Prev/next git hunk                                    |
 | `[t` / `]t`        | Prev/next TODO comment                                |
 | `[a` / `]a`        | Prev/next symbol (aerial)                             |
@@ -42,7 +44,7 @@ Leader = **Space**. Localleader = **\\**.
 
 | Key                                     | Action                       |
 | --------------------------------------- | ---------------------------- |
-| `<C-h/j/k/l>`                           | Move between splits          |
+| `<C-h/j/k/l>`                           | Move between splits (and tmux panes) |
 | `<C-Up/Down/Left/Right>`                | Resize split                 |
 | `<leader>sv` / `<leader>sh`             | Vertical / horizontal split  |
 | `<S-l>` / `<S-h>`                       | Next / prev buffer           |
@@ -50,12 +52,13 @@ Leader = **Space**. Localleader = **\\**.
 | `<leader>bo`                            | Close all other buffers      |
 | `<leader>w` / `<leader>q` / `<leader>Q` | Save / quit / force quit all |
 
-## File Explorer (neo-tree)
+## File Explorer
 
 | Key                                   | Action                           |
 | ------------------------------------- | -------------------------------- |
-| `<leader>e`                           | Toggle explorer                  |
-| `<leader>o`                           | Focus explorer                   |
+| `<leader>e`                           | Toggle neo-tree                  |
+| `<leader>o`                           | Focus neo-tree                   |
+| `-`                                   | **Oil** — edit parent dir as a buffer (rename/delete files like text, `:w` applies) |
 | Inside tree: `l` / `h` / `<CR>` / `/` | Open / close / open / fuzzy find |
 
 ## LSP (active when a language server attaches)
@@ -86,26 +89,28 @@ Leader = **Space**. Localleader = **\\**.
 
 ## Diagnostics & Outline
 
-| Key          | Action                                         |
-| ------------ | ---------------------------------------------- |
-| `<leader>xd` | Line diagnostics (float)                       |
-| `<leader>xx` | Toggle Trouble panel (all diagnostics)         |
-| `<leader>xX` | Buffer diagnostics                             |
-| `<leader>xs` | Trouble symbols                                |
-| `<leader>xl` | Trouble LSP                                    |
-| `<leader>xq` | Trouble quickfix                               |
-| `<leader>xi` | **Project health dashboard** (full repo audit) |
-| `<leader>a`  | Toggle code outline (aerial)                   |
+Diagnostics render as a boxed message on the cursor line (tiny-inline-diagnostic); other lines show gutter signs only.
+
+| Key          | Action                                 |
+| ------------ | -------------------------------------- |
+| `<leader>xd` | Line diagnostics float (focusable — press again to enter, yank from it) |
+| `<leader>xy` | **Yank diagnostics on current line to clipboard** |
+| `<leader>xx` | Toggle Trouble panel (all diagnostics) |
+| `<leader>xX` | Buffer diagnostics (Trouble)           |
+| `<leader>xs` | Trouble symbols                        |
+| `<leader>xl` | Trouble LSP                            |
+| `<leader>xq` | Trouble quickfix                       |
+| `<leader>a`  | Toggle code outline (aerial)           |
 
 ## Format & Code
 
-| Key                         | Action                             |
-| --------------------------- | ---------------------------------- |
-| `<leader>cf`                | Format buffer (conform)            |
-| `<leader>cF`                | Force format with LSP fallback     |
-| `<leader>ct`                | Scan ghost twins (clone detection) |
-| `<leader>cT`                | Clear ghost twins                  |
-| `<leader>cn` / `<leader>cp` | Next / prev ghost twin             |
+| Key          | Action                         |
+| ------------ | ------------------------------ |
+| `<leader>cf` | Format buffer (conform)        |
+| `<leader>cF` | Force format with LSP fallback |
+| `gcc` / `gc` | Comment line / selection (native) |
+
+Format-on-save is enabled (2.5s timeout, skips huge files). Project formatter configs (`.prettierrc`, `stylua.toml`, `ruff.toml`, ...) always win over the editor defaults.
 
 ## Git
 
@@ -123,17 +128,25 @@ Leader = **Space**. Localleader = **\\**.
 | `<leader>gc`                | Close diffview              |
 | `<leader>gD`                | Diff this file              |
 
-## Terminal & Tasks
+## Terminal & REPLs
 
-| Key                                                       | Action                                                                        |
-| --------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| `<leader>tt` / `<leader>tv` / `<leader>tf`                | Terminal horizontal / vertical / float                                        |
-| `<leader>tp`                                              | IPython REPL                                                                  |
-| `<leader>tn`                                              | Node REPL                                                                     |
-| `<leader>tr`                                              | **Pick project task** (stack-tasks — detects npm/pnpm/yarn/bun/poetry/docker) |
-| `<leader>tl`                                              | Run last task                                                                 |
-| `<leader>tD` / `<leader>tT` / `<leader>tB` / `<leader>tL` | Run dev / test / build / lint                                                 |
-| `<Esc>` (inside terminal)                                 | Exit terminal mode                                                            |
+| Key                                        | Action                                 |
+| ------------------------------------------ | -------------------------------------- |
+| `<leader>tt` / `<leader>tv` / `<leader>tf` | Terminal horizontal / vertical / float |
+| `<leader>tp`                               | IPython REPL                           |
+| `<leader>tn`                               | Node REPL                              |
+| `<Esc>` (inside terminal)                  | Exit terminal mode                     |
+
+## Jupyter (.ipynb via jupytext, `# %%` cells)
+
+| Key                         | Action                    |
+| --------------------------- | ------------------------- |
+| `]j` / `[j`                 | Next / previous cell      |
+| `<leader>jx`                | Run cell                  |
+| `<leader>jj`                | Run cell and move         |
+| `<leader>ja` / `<leader>jb` | Run all / cells below     |
+| `<leader>jo` / `<leader>jO` | Add cell below / above    |
+| `<leader>jr` / `<leader>js` | REPL open / send (iron)   |
 
 ## Harpoon (quick file switching)
 
@@ -144,17 +157,13 @@ Leader = **Space**. Localleader = **\\**.
 | `<leader>1..4`              | Jump to harpoon slot 1–4    |
 | `<leader>hp` / `<leader>hn` | Prev / next harpoon         |
 
-## Routes, HTTP, Env
+## HTTP Client (kulala, `.http` files)
 
-| Key                         | Action                                               |
-| --------------------------- | ---------------------------------------------------- |
-| `<leader>rl`                | **Route lens** — list all API routes in project      |
-| `<leader>rq`                | Send routes to quickfix                              |
-| `<leader>rr`                | Run `.http` request (kulala)                         |
-| `<leader>ra`                | Run all HTTP requests in file                        |
-| `<leader>rp` / `<leader>rn` | Prev / next HTTP request                             |
-| `<leader>ee`                | **Env sentinel** — find missing / duplicate env keys |
-| `<leader>ec`                | Clear env diagnostics                                |
+| Key                         | Action                        |
+| --------------------------- | ----------------------------- |
+| `<leader>rr`                | Run request under cursor      |
+| `<leader>ra`                | Run all requests in file      |
+| `<leader>rp` / `<leader>rn` | Prev / next request           |
 
 ## package.json (when editing it)
 
@@ -168,16 +177,30 @@ Leader = **Space**. Localleader = **\\**.
 
 | Key                  | Action                                    |
 | -------------------- | ----------------------------------------- |
-| `<leader>ps`         | Restore last session for cwd              |
-| `<leader>pl`         | Restore last session (global)             |
+| `<leader>ps`         | Restore session for cwd                   |
+| `<leader>pl`         | Restore last session                      |
 | `<leader>pd`         | Stop session saving                       |
+| `<leader>.`          | Scratch buffer (snacks)                   |
+| `<leader>f.`         | Pick scratch buffer                       |
 | `<leader>u`          | Undo tree                                 |
 | `<leader>z`          | Zen mode (distraction-free)               |
-| `<leader>mp`         | Markdown preview                          |
 | `<Esc>`              | Clear search highlight                    |
-| `<leader>p` (visual) | Paste without yanking replaced text       |
 | `<A-j>` / `<A-k>`    | Move line down / up (works in visual too) |
 | `<` / `>` (visual)   | Indent / outdent, stay in selection       |
+| `zR` / `zM`          | Open / close all folds (ufo)              |
+
+## Completion (insert mode, blink.cmp)
+
+| Key             | Action                          |
+| --------------- | ------------------------------- |
+| `<C-Space>`     | Trigger completion menu         |
+| `<C-j>` / `<C-k>` | Next / previous item          |
+| `<CR>`          | Confirm                         |
+| `<Tab>` / `<S-Tab>` | Select next / snippet jump  |
+| `<C-e>`         | Dismiss                         |
+| `<C-b>` / `<C-f>` | Scroll docs                   |
+
+Cmdline (`:`, `/`, `?`) completes too — same keys.
 
 ## Text Objects (visual/operator, mini.ai + treesitter)
 
@@ -196,18 +219,12 @@ Type these after `d/c/y/v`:
 
 ## Plugins / Health
 
-| Key / Command    | Action                                         |
-| ---------------- | ---------------------------------------------- |
-| `:Lazy`          | Plugin manager                                 |
-| `:Mason`         | Install LSPs/formatters                        |
-| `:checkhealth`   | Full health report                             |
-| `:ProjectHealth` | Your dashboard (lint+tsc+ruff+hadolint rollup) |
-| `:ConformInfo`   | Formatter status for current buffer            |
-| `:LspInfo`       | Attached LSP servers                           |
-
-## Discovery — forget any key?
-
-Just press `<Space>` and wait — **which-key** shows menu of all leader bindings. Or run `<leader>fk` for searchable keymap list.
+| Command          | Action                               |
+| ---------------- | ------------------------------------ |
+| `:Lazy`          | Plugin manager                       |
+| `:Mason`         | Install LSPs/formatters              |
+| `:checkhealth`   | Full health report                   |
+| `:ConformInfo`   | Formatter status for current buffer  |
 
 ---
 
@@ -215,11 +232,11 @@ Just press `<Space>` and wait — **which-key** shows menu of all leader binding
 
 1. `<leader>ff` — find files
 2. `<leader>fg` — grep project
-3. `<leader>e` — explorer
+3. `<leader>e` — explorer (`-` for oil)
 4. `<leader>gg` — LazyGit
 5. `<leader>cf` — format
 6. `<leader>ca` — code action
 7. `<leader>rn` — rename symbol
 8. `gd` — go to definition
 9. `K` — hover docs
-10. `<leader>xi` — project health dashboard
+10. `]e` / `[e` — jump between errors

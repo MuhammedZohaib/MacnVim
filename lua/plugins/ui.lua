@@ -9,7 +9,7 @@ return {
         globalstatus = true,
         section_separators = { left = "", right = "" },
         component_separators = { left = "", right = "" },
-        disabled_filetypes = { statusline = { "neo-tree" } },
+        disabled_filetypes = { statusline = { "neo-tree", "snacks_dashboard" } },
       },
       sections = {
         lualine_a = { { "mode", fmt = function(str) return " " .. str end } },
@@ -48,32 +48,60 @@ return {
       indent = { char = "|" },
       scope = { enabled = true, show_start = false },
       exclude = {
-        filetypes = { "help", "lazy", "mason", "neo-tree", "notify", "qf", "terminal" },
+        filetypes = { "help", "lazy", "mason", "neo-tree", "snacks_notif", "snacks_dashboard", "qf", "terminal" },
       },
     },
   },
 
   {
-    "rcarriga/nvim-notify",
-    event = "VeryLazy",
+    "folke/snacks.nvim",
+    priority = 1000,
+    lazy = false, -- dashboard must own VimEnter; bigfile hooks BufReadPre
     opts = {
-      render = "compact",
-      stages = "static",
-      timeout = 1800,
-      max_width = 72,
+      bigfile = { enabled = true },
+      notifier = {
+        enabled = true,
+        timeout = 1800,
+        width = { max = 72 },
+      },
+      scratch = {},
+      dashboard = {
+        enabled = true,
+        preset = {
+          header = table.concat({
+            [[                                                            ]],
+            [[ ███╗   ███╗ █████╗  ██████╗███╗   ██╗██╗   ██╗██╗███╗   ███╗ ]],
+            [[ ████╗ ████║██╔══██╗██╔════╝████╗  ██║██║   ██║██║████╗ ████║ ]],
+            [[ ██╔████╔██║███████║██║     ██╔██╗ ██║██║   ██║██║██╔████╔██║ ]],
+            [[ ██║╚██╔╝██║██╔══██║██║     ██║╚██╗██║╚██╗ ██╔╝██║██║╚██╔╝██║ ]],
+            [[ ██║ ╚═╝ ██║██║  ██║╚██████╗██║ ╚████║ ╚████╔╝ ██║██║ ╚═╝ ██║ ]],
+            [[ ╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═══╝  ╚═══╝  ╚═╝╚═╝     ╚═╝ ]],
+            [[                                                            ]],
+            [[            Full-stack editor, crafted to ship.             ]],
+          }, "\n"),
+          keys = {
+            { icon = "", key = "f", desc = "Find file", action = ":FzfLua files" },
+            { icon = "", key = "r", desc = "Recent files", action = ":FzfLua oldfiles" },
+            { icon = "", key = "g", desc = "Live grep", action = ":FzfLua live_grep" },
+            { icon = "", key = "n", desc = "New file", action = ":enew" },
+            { icon = "", key = "e", desc = "Explorer", action = ":Neotree toggle" },
+            { icon = "", key = "s", desc = "Restore session", action = ":lua require('persistence').load()" },
+            { icon = "󰒲", key = "l", desc = "Lazy", action = ":Lazy" },
+            { icon = "", key = "m", desc = "Mason", action = ":Mason" },
+            { icon = "", key = "c", desc = "Config", action = ":edit ~/.config/nvim/init.lua" },
+            { icon = "", key = "q", desc = "Quit", action = ":qa" },
+          },
+        },
+        sections = {
+          { section = "header" },
+          { section = "keys", gap = 0, padding = 1 },
+          { section = "startup" },
+        },
+      },
     },
-    config = function(_, opts)
-      require("notify").setup(opts)
-      vim.notify = require("notify")
-    end,
-  },
-
-  {
-    "stevearc/dressing.nvim",
-    event = "VeryLazy",
-    opts = {
-      input = { border = "rounded" },
-      select = { backend = { "fzf_lua", "builtin" } },
+    keys = {
+      { "<leader>.", function() Snacks.scratch() end, desc = "Scratch buffer" },
+      { "<leader>f.", function() Snacks.scratch.select() end, desc = "Select scratch" },
     },
   },
 
@@ -100,95 +128,16 @@ return {
   },
 
   {
-    "goolord/alpha-nvim",
-    event = "VimEnter",
-    dependencies = { "nvim-tree/nvim-web-devicons" },
-    config = function()
-      local alpha = require("alpha")
-      local dashboard = require("alpha.themes.dashboard")
-
-      dashboard.section.header.val = {
-        [[                                                         ]],
-        [[  ██████╗ ██╗  ██╗ ██████╗    ███╗   ██╗██╗   ██╗██╗███╗ ███╗ ]],
-        [[  ██╔══██╗██║  ██║██╔════╝    ████╗  ██║██║   ██║██║████╗████║ ]],
-        [[  ██║  ██║███████║██║         ██╔██╗ ██║██║   ██║██║██╔████╔██║ ]],
-        [[  ██║  ██║╚════██║██║         ██║╚██╗██║╚██╗ ██╔╝██║██║╚██╔╝██║ ]],
-        [[  ██████╔╝     ██║╚██████╗    ██║ ╚████║ ╚████╔╝ ██║██║ ╚═╝ ██║ ]],
-        [[  ╚═════╝      ╚═╝ ╚═════╝    ╚═╝  ╚═══╝  ╚═══╝  ╚═╝╚═╝     ╚═╝ ]],
-        [[                                                         ]],
-        [[              Full-stack editor, crafted to ship.         ]],
-        [[                                                         ]],
-      }
-
-      dashboard.section.buttons.val = {
-        dashboard.button("f", "   Find file",          "<cmd>FzfLua files<CR>"),
-        dashboard.button("r", "   Recent files",       "<cmd>FzfLua oldfiles<CR>"),
-        dashboard.button("g", "   Live grep",          "<cmd>FzfLua live_grep<CR>"),
-        dashboard.button("n", "   New file",           "<cmd>enew<CR>"),
-        dashboard.button("e", "   Explorer",           "<cmd>Neotree toggle<CR>"),
-        dashboard.button("s", "   Restore session",    "<cmd>lua require('persistence').load()<CR>"),
-        dashboard.button("l", "󰒲   Lazy",                "<cmd>Lazy<CR>"),
-        dashboard.button("m", "   Mason",               "<cmd>Mason<CR>"),
-        dashboard.button("c", "   Config",             "<cmd>edit ~/.config/nvim/init.lua<CR>"),
-        dashboard.button("q", "   Quit",               "<cmd>qa<CR>"),
-      }
-
-      local function footer()
-        local ok, lazy = pcall(require, "lazy")
-        local count = ok and lazy.stats and lazy.stats().count or 0
-        local ms = ok and lazy.stats and math.floor((lazy.stats().startuptime or 0) + 0.5) or 0
-        return string.format("  %d plugins loaded in %d ms", count, ms)
-      end
-
-      dashboard.section.header.opts.hl = "Keyword"
-      dashboard.section.buttons.opts.hl = "Function"
-      dashboard.section.footer.opts.hl = "Comment"
-      dashboard.opts.layout[1].val = 2
-
-      alpha.setup(dashboard.opts)
-
-      vim.api.nvim_create_autocmd("User", {
-        once = true,
-        pattern = "LazyVimStarted",
-        callback = function()
-          dashboard.section.footer.val = footer()
-          pcall(vim.cmd, "AlphaRedraw")
-        end,
-      })
-
-      vim.api.nvim_create_autocmd("User", {
-        once = true,
-        pattern = "AlphaReady",
-        callback = function()
-          dashboard.section.footer.val = footer()
-          pcall(vim.cmd, "AlphaRedraw")
-        end,
-      })
-
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = "alpha",
-        callback = function()
-          vim.opt_local.cursorline = false
-          vim.opt_local.foldenable = false
-          vim.opt_local.signcolumn = "no"
-        end,
-      })
-    end,
-  },
-
-  {
     "folke/noice.nvim",
     event = "VeryLazy",
     dependencies = {
       "MunifTanjim/nui.nvim",
-      "rcarriga/nvim-notify",
     },
     opts = {
       lsp = {
         override = {
           ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
           ["vim.lsp.util.stylize_markdown"] = true,
-          ["cmp.entry.get_documentation"] = true,
         },
         signature = { enabled = false },
         hover = { enabled = false },
