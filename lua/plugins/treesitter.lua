@@ -1,136 +1,101 @@
-local function has_core_treesitter()
-  if type(vim.treesitter) == "table" then
-    return true
-  end
+-- nvim-treesitter `main` branch: opt-in per-filetype model.
+-- Parsers + queries install into stdpath('data')/site (single location —
+-- the old master-branch setup had three parser dirs shadowing each other,
+-- which caused random decoration-provider errors until restart).
 
-  vim.schedule(function()
-    vim.notify(
-      "Neovim core Treesitter API is unavailable. Restart Neovim after plugin/runtime updates; check `:version` if this repeats.",
-      vim.log.levels.ERROR
-    )
-  end)
+local ensure_installed = {
+  "bash",
+  "css",
+  "dockerfile",
+  "html",
+  "javascript",
+  "json",
+  "lua",
+  "markdown",
+  "markdown_inline",
+  "python",
+  "query",
+  "regex",
+  "toml",
+  "tsx",
+  "typescript",
+  "vim",
+  "vimdoc",
+  "yaml",
+}
 
-  return false
-end
+-- Filetypes where treesitter highlighting stays off (regex syntax instead).
+local highlight_skip = {
+  markdown = true,
+  gitcommit = true,
+}
 
-local parser_install_dir = vim.fn.stdpath("data") .. "/treesitter-parsers"
-
-local function ensure_parser_install_dir()
-  local parser_dir = parser_install_dir .. "/parser"
-  local ok = pcall(vim.fn.mkdir, parser_dir, "p")
-  if ok and vim.fn.isdirectory(parser_dir) == 1 then
-    vim.opt.runtimepath:prepend(parser_install_dir)
-    return parser_install_dir
-  end
-
-  vim.schedule(function()
-    vim.notify(
-      "Treesitter parser directory is not writable: " .. parser_install_dir,
-      vim.log.levels.WARN
-    )
-  end)
-
-  return nil
-end
+-- Filetypes keeping their own indent logic.
+local indent_skip = {
+  markdown = true,
+  python = true,
+  yaml = true,
+}
 
 return {
   {
     "nvim-treesitter/nvim-treesitter",
-    branch = "master",
+    branch = "main",
+    lazy = false, -- main branch does not support lazy-loading
     build = ":TSUpdate",
-    event = { "BufReadPre", "BufNewFile" },
-    cond = has_core_treesitter,
-    dependencies = {
-      { "nvim-treesitter/nvim-treesitter-textobjects", branch = "master" },
-    },
-    init = function()
-      ensure_parser_install_dir()
-    end,
     config = function()
-      local ok, ts_configs = pcall(require, "nvim-treesitter.configs")
-      if not ok then
-        vim.schedule(function()
-          vim.notify("nvim-treesitter API mismatch. Run :Lazy sync.", vim.log.levels.WARN)
-        end)
-        return
-      end
+      local ts = require("nvim-treesitter")
+      ts.setup({}) -- default install_dir: stdpath('data')/site
 
-      local opts = {
-        ensure_installed = {
-          "bash",
-          "css",
-          "dockerfile",
-          "html",
-          "javascript",
-          "json",
-          "jsonc",
-          "lua",
-          "markdown",
-          "markdown_inline",
-          "python",
-          "query",
-          "regex",
-          "toml",
-          "tsx",
-          "typescript",
-          "vim",
-          "vimdoc",
-          "yaml",
-        },
-        auto_install = false,
-        highlight = {
-          enable = true,
-          disable = function(lang, bufnr)
-            local ft = vim.bo[bufnr].filetype
-            return lang == "markdown"
-              or lang == "markdown_inline"
-              or ft == "markdown"
-              or ft == "gitcommit"
-          end,
-        },
-        indent = {
-          enable = true,
-          disable = { "markdown", "python" },
-        },
-        textobjects = {
-          select = {
-            enable = true,
-            lookahead = true,
-            keymaps = {
-              ["af"] = "@function.outer",
-              ["if"] = "@function.inner",
-              ["ac"] = "@class.outer",
-              ["ic"] = "@class.inner",
-              ["aa"] = "@parameter.outer",
-              ["ia"] = "@parameter.inner",
-            },
-          },
-          move = {
-            enable = true,
-            goto_next_start = {
-              ["]f"] = "@function.outer",
-              ["]c"] = "@class.outer",
-            },
-            goto_previous_start = {
-              ["[f"] = "@function.outer",
-              ["[c"] = "@class.outer",
-            },
-          },
-        },
-      }
+      -- No standalone jsonc grammar on the main branch; json parser covers it.
+      vim.treesitter.language.register("json", "jsonc")
 
-      local parser_dir = ensure_parser_install_dir()
-      if parser_dir then
-        opts.parser_install_dir = parser_dir
-      end
+      -- Async + idempotent: skips parsers already installed.
+      ts.install(ensure_installed)
 
-      ts_configs.setup(opts)
+      vim.api.nvim_create_autocmd("FileType", {
+        group = vim.api.nvim_create_augroup("TreesitterStart", { clear = true }),
+        callback = function(args)
+          local ft = args.match
+          if highlight_skip[ft] then
+            return
+          end
+
+          local lang = vim.treesitter.language.get_lang(ft) or ft
+          -- pcall: no parser for this lang -> silently keep regex syntax.
+          if not pcall(vim.treesitter.start, args.buf, lang) then
+            return
+          end
+
+          if not indent_skip[ft] then
+            vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+          end
+          -- Folding stays owned by nvim-ufo; no foldexpr here.
+        end,
+      })
     end,
   },
+
+  {
+    -- Move-only: select textobjects (af/if/ac/ic/aa/ia) are owned by mini.ai.
+    "nvim-treesitter/nvim-treesitter-textobjects",
+    branch = "main",
+    keys = {
+      { "]f", function() require("nvim-treesitter-textobjects.move").goto_next_start("@function.outer", "textobjects") end, mode = { "n", "x", "o" }, desc = "Next function" },
+      { "]c", function() require("nvim-treesitter-textobjects.move").goto_next_start("@class.outer", "textobjects") end, mode = { "n", "x", "o" }, desc = "Next class" },
+      { "[f", function() require("nvim-treesitter-textobjects.move").goto_previous_start("@function.outer", "textobjects") end, mode = { "n", "x", "o" }, desc = "Previous function" },
+      { "[c", function() require("nvim-treesitter-textobjects.move").goto_previous_start("@class.outer", "textobjects") end, mode = { "n", "x", "o" }, desc = "Previous class" },
+    },
+    config = function()
+      require("nvim-treesitter-textobjects").setup({
+        move = { set_jumps = true },
+      })
+    end,
+  },
+
   {
     "windwp/nvim-ts-autotag",
     event = "InsertEnter",
-    cond = has_core_treesitter,
     opts = {
       opts = {
         enable_close = true,

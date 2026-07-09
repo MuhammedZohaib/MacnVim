@@ -96,20 +96,37 @@ map("t", "<Esc>", [[<C-\><C-n>]], opts)
 -- Diagnostics
 map("n", "<leader>xd", vim.diagnostic.open_float, vim.tbl_extend("force", opts, { desc = "Line diagnostics" }))
 map("n", "<leader>xx", "<cmd>Trouble diagnostics toggle<CR>", vim.tbl_extend("force", opts, { desc = "Diagnostics list" }))
-map("n", "[d", function()
+-- float=false: tiny-inline-diagnostic already shows the message at the cursor
+local function diag_jump(count, severity)
   if vim.diagnostic.jump then
-    vim.diagnostic.jump({ count = -1, float = true })
+    vim.diagnostic.jump({ count = count, float = false, severity = severity })
+  elseif count < 0 then
+    vim.diagnostic.goto_prev({ severity = severity })
   else
-    vim.diagnostic.goto_prev()
+    vim.diagnostic.goto_next({ severity = severity })
   end
-end, opts)
-map("n", "]d", function()
-  if vim.diagnostic.jump then
-    vim.diagnostic.jump({ count = 1, float = true })
-  else
-    vim.diagnostic.goto_next()
+end
+map("n", "[d", function() diag_jump(-1) end, vim.tbl_extend("force", opts, { desc = "Previous diagnostic" }))
+map("n", "]d", function() diag_jump(1) end, vim.tbl_extend("force", opts, { desc = "Next diagnostic" }))
+map("n", "[e", function() diag_jump(-1, vim.diagnostic.severity.ERROR) end, vim.tbl_extend("force", opts, { desc = "Previous error" }))
+map("n", "]e", function() diag_jump(1, vim.diagnostic.severity.ERROR) end, vim.tbl_extend("force", opts, { desc = "Next error" }))
+
+-- Yank all diagnostics on the current line to system clipboard
+map("n", "<leader>xy", function()
+  local lnum = vim.api.nvim_win_get_cursor(0)[1] - 1
+  local diags = vim.diagnostic.get(0, { lnum = lnum })
+  if vim.tbl_isempty(diags) then
+    vim.notify("No diagnostics on this line", vim.log.levels.INFO)
+    return
   end
-end, opts)
+  local lines = {}
+  for _, d in ipairs(diags) do
+    table.insert(lines, d.message)
+  end
+  local text = table.concat(lines, "\n")
+  vim.fn.setreg("+", text)
+  vim.notify("Yanked " .. #diags .. " diagnostic(s)", vim.log.levels.INFO)
+end, vim.tbl_extend("force", opts, { desc = "Yank line diagnostics" }))
 
 -- Misc
 map("n", "<leader>P", "<cmd>QuickLook<CR>", vim.tbl_extend("force", opts, { desc = "Quick Look preview" }))

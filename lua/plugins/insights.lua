@@ -33,7 +33,8 @@ return {
         "Trouble",
         "lazy",
         "mason",
-        "notify",
+        "snacks_notif",
+        "snacks_dashboard",
         "qf",
       },
       handlers = {

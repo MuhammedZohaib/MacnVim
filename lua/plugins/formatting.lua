@@ -47,6 +47,12 @@ return {
         return vim.api.nvim_buf_line_count(bufnr) > max_format_lines
       end
 
+      -- Editor default = 120 columns, fallback-only: if the project ships its
+      -- own formatter config, that wins and we pass no width flags.
+      local function has_project_config(ctx, names)
+        return #vim.fs.find(names, { path = ctx.dirname, upward = true, type = "file" }) > 0
+      end
+
       local function should_skip_format(bufnr)
         local name = vim.api.nvim_buf_get_name(bufnr)
         if name == "" or name:find("/node_modules/", 1, true) or name:find("/.git/", 1, true) then
@@ -72,19 +78,38 @@ return {
           }
         end,
         formatters = {
+          -- require_cwd dropped: prettier now formats files outside projects
+          -- too, using its built-in defaults (printWidth 80). Project configs
+          -- still win — prettier resolves them from the file's path.
           prettierd = {
             condition = function()
               return vim.fn.executable("prettierd") == 1
             end,
             cwd = util.root_file(prettier_roots),
-            require_cwd = true,
           },
           prettier = {
             condition = function()
               return vim.fn.executable("prettierd") == 0 and vim.fn.executable("prettier") == 1
             end,
             cwd = util.root_file(prettier_roots),
-            require_cwd = true,
+          },
+          stylua = {
+            -- Match editor default (stylua's own default is also 120).
+            prepend_args = function(_, ctx)
+              if has_project_config(ctx, { "stylua.toml", ".stylua.toml" }) then
+                return {}
+              end
+              return { "--column-width", "120" }
+            end,
+          },
+          ruff_format = {
+            -- ruff defaults to 88; use 120 unless project owns Python style.
+            append_args = function(_, ctx)
+              if has_project_config(ctx, { "ruff.toml", ".ruff.toml", "pyproject.toml", "setup.cfg" }) then
+                return {}
+              end
+              return { "--line-length", "120" }
+            end,
           },
         },
         formatters_by_ft = {

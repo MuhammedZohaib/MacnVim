@@ -114,14 +114,14 @@ au("VimEnter", {
         open_neotree(arg0)
       end
     end
-    -- Blank-buffer handling owned by alpha-nvim dashboard.
+    -- Blank-buffer handling owned by snacks.nvim dashboard.
     -- Session restore is on-demand via <leader>ps / <leader>pl.
   end,
 })
 
 au("FileType", {
   group = ag("QuickClose", { clear = true }),
-  pattern = { "help", "qf", "lspinfo", "man", "notify", "spectre_panel", "checkhealth", "startuptime" },
+  pattern = { "help", "qf", "lspinfo", "man", "snacks_notif", "grug-far", "checkhealth", "startuptime" },
   callback = function(event)
     vim.keymap.set("n", "q", "<cmd>q<CR>", { buffer = event.buf, silent = true })
   end,
@@ -157,7 +157,7 @@ au("FileType", {
     vim.opt_local.shiftwidth = 4
     vim.opt_local.tabstop = 4
     vim.opt_local.softtabstop = 4
-    vim.opt_local.colorcolumn = "88"
+    vim.opt_local.colorcolumn = "120"
   end,
 })
 
@@ -165,19 +165,14 @@ au("FileType", {
   group = ag("MarkdownSettings", { clear = true }),
   pattern = { "markdown", "gitcommit" },
   callback = function(args)
+    -- Our TS autocmd skips these filetypes, but nvim's runtime
+    -- ftplugin/markdown.lua calls vim.treesitter.start() itself — undo it.
     pcall(vim.treesitter.stop, args.buf)
     vim.bo[args.buf].syntax = "markdown"
     vim.opt_local.wrap = true
     vim.opt_local.linebreak = true
     vim.opt_local.spell = true
-    vim.opt_local.textwidth = 100
-
-    vim.schedule(function()
-      if vim.api.nvim_buf_is_valid(args.buf) then
-        pcall(vim.treesitter.stop, args.buf)
-        vim.bo[args.buf].syntax = "markdown"
-      end
-    end)
+    vim.opt_local.textwidth = 80
   end,
 })
 

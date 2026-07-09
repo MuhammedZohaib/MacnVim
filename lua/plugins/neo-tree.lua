@@ -1,5 +1,16 @@
 return {
 	{
+		"stevearc/oil.nvim",
+		dependencies = { "nvim-tree/nvim-web-devicons" },
+		cmd = "Oil",
+		keys = {
+			{ "-", "<cmd>Oil<CR>", desc = "Open parent directory (oil)" },
+		},
+		-- default_file_explorer=false: neo-tree owns dir-arg startup (autocmds StartupLayout)
+		opts = { default_file_explorer = false },
+	},
+
+	{
 		"nvim-neo-tree/neo-tree.nvim",
 		branch = "v3.x",
 		cmd = "Neotree",
@@ -12,7 +23,7 @@ return {
 			close_if_last_window = true,
 			window = {
 				width = 35,
-				position = "left",
+				position = "right",
 				mappings = {
 					["<space>"] = false,
 					["l"] = "open",

@@ -65,7 +65,6 @@ return {
   {
     "GCBallesteros/NotebookNavigator.nvim",
     dependencies = {
-      "echasnovski/mini.comment", -- used only for cell-marker comment string
       "Vigemus/iron.nvim",
     },
     ft = { "python", "julia", "r" },
@@ -76,6 +75,7 @@ return {
       { "<leader>jj", function() require("notebook-navigator").run_and_move() end, desc = "Run cell and move" },
       { "<leader>ja", function() require("notebook-navigator").run_all_cells() end, desc = "Run all cells" },
       { "<leader>jb", function() require("notebook-navigator").run_cells_below() end, desc = "Run cells below" },
+      -- TODO: comment_cell needs Comment.nvim or mini.comment backend; no-ops since Comment.nvim removal
       { "<leader>jc", function() require("notebook-navigator").comment_cell() end, desc = "Comment cell" },
       { "<leader>jo", function() require("notebook-navigator").add_cell_below() end, desc = "Add cell below" },
       { "<leader>jO", function() require("notebook-navigator").add_cell_above() end, desc = "Add cell above" },

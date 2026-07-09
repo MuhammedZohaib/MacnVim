@@ -27,17 +27,11 @@ return {
   },
 
   {
-    "numToStr/Comment.nvim",
-    event = "BufReadPost",
-    opts = {},
-  },
-
-  {
-    "nvim-pack/nvim-spectre",
-    cmd = "Spectre",
+    "MagicDuck/grug-far.nvim",
+    cmd = "GrugFar",
     keys = {
-      { "<leader>S", function() require("spectre").open() end, desc = "Replace in project" },
-      { "<leader>sw", function() require("spectre").open_visual({ select_word = true }) end, desc = "Replace word" },
+      { "<leader>S", function() require("grug-far").open() end, desc = "Replace in project" },
+      { "<leader>sw", function() require("grug-far").open({ prefills = { search = vim.fn.expand("<cword>") } }) end, desc = "Replace word" },
     },
     opts = {},
   },
@@ -86,12 +80,7 @@ return {
     "kevinhwang91/nvim-ufo",
     dependencies = "kevinhwang91/promise-async",
     event = "BufReadPost",
-    init = function()
-      vim.o.foldmethod = "manual"
-      vim.o.foldlevel = 99
-      vim.o.foldlevelstart = 99
-      vim.o.foldenable = true
-    end,
+    -- Fold defaults live in core/options.lua; ufo takes over on attach.
     keys = {
       { "zR", function() require("ufo").openAllFolds() end, desc = "Open all folds" },
       { "zM", function() require("ufo").closeAllFolds() end, desc = "Close all folds" },
