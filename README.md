@@ -1,8 +1,8 @@
 # Macnvim
 
-A fast, modern Neovim configuration for full-stack development — TypeScript/JavaScript, Python, shell, Docker, Markdown,
-and Jupyter notebooks. Built on native Neovim APIs (0.11+ LSP, treesitter main branch) with a curated plugin set instead
-of a kitchen-sink distro.
+A fast, modern Neovim configuration for full-stack development — TypeScript/JavaScript, Python, shell, Docker, and
+Markdown. Built on native Neovim APIs (0.11+ LSP, treesitter main branch) with a curated plugin set instead of a
+kitchen-sink distro.
 
 ![Neovim 0.11+](https://img.shields.io/badge/Neovim-0.11%2B-57A143?logo=neovim&logoColor=white)
 ![Lua](https://img.shields.io/badge/Made%20with-Lua-2C2D72?logo=lua&logoColor=white)
@@ -16,15 +16,13 @@ of a kitchen-sink distro.
 - **Clean diagnostics**: [tiny-inline-diagnostic](https://github.com/rachartier/tiny-inline-diagnostic.nvim) — boxed
   message on the cursor line only, wrapped so it never runs off-screen; gutter signs elsewhere
 - **Picker-centric**: [fzf-lua](https://github.com/ibhagwan/fzf-lua) for files/grep/symbols/diagnostics,
-  [neo-tree](https://github.com/nvim-neo-tree/neo-tree.nvim) sidebar + [oil.nvim](https://github.com/stevearc/oil.nvim)
-  for edit-dirs-as-buffers
+  [neo-tree](https://github.com/nvim-neo-tree/neo-tree.nvim) sidebar
 - **One UI toolkit**: [snacks.nvim](https://github.com/folke/snacks.nvim) dashboard, notifier, bigfile handling, scratch
   buffers
 - **[Kanagawa](https://github.com/rebelot/kanagawa.nvim) Dragon** theme
 - **Format on save**: conform.nvim (prettier/stylua/ruff/shfmt) with project-config-wins fallbacks, nvim-lint
   (shellcheck/hadolint/markdownlint)
-- **Git suite**: gitsigns, diffview, LazyGit, merge-conflict helpers
-- **Jupyter workflow**: `.ipynb` editing via jupytext + iron.nvim REPL + cell navigation
+- **Git**: gitsigns hunks/blame + LazyGit in a snacks float
 - **Lazy-loaded**: nearly every plugin loads on demand; startup stays snappy
 
 ## Requirements
@@ -36,7 +34,7 @@ of a kitchen-sink distro.
 | [ripgrep](https://github.com/BurntSushi/ripgrep)                 | live grep, project search              |
 | a [Nerd Font](https://www.nerdfonts.com/)                        | icons everywhere                       |
 | Node.js + npm                                                    | TS/JS language servers                 |
-| Python 3 + pip                                                   | pyright/ruff, Jupyter workflow         |
+| Python 3 + pip                                                   | pyright/ruff                           |
 | make, tree-sitter CLI                                            | parser + native module builds          |
 | [lazygit](https://github.com/jesseduffield/lazygit) _(optional)_ | `<leader>gg` git TUI                   |
 | [fd](https://github.com/sharkdp/fd) _(optional)_                 | faster file finding                    |
@@ -89,19 +87,17 @@ NVIM_APPNAME=macnvim nvim
 │   └── lazy.lua             # plugin manager bootstrap
 └── lua/plugins/             # one file per concern, auto-imported
     ├── colorscheme.lua      # kanagawa (dragon)
-    ├── lsp.lua              # servers, diagnostics, Mason, Trouble
+    ├── lsp.lua              # servers, diagnostics, Mason
     ├── completion.lua       # blink.cmp + LuaSnip
     ├── treesitter.lua       # parsers, textobjects, autotag
     ├── formatting.lua       # conform + nvim-lint
     ├── fzf.lua              # fzf-lua picker
-    ├── neo-tree.lua         # explorer + oil.nvim
-    ├── git.lua              # gitsigns, diffview, lazygit
-    ├── editing.lua          # surround, flash, grug-far, which-key, folds
-    ├── ui.lua               # snacks, lualine, bufferline, noice, ...
-    ├── fullstack.lua        # typescript-tools, harpoon, kulala, aerial
-    ├── terminal.lua         # toggleterm + REPLs
-    ├── jupyter.lua          # jupytext, iron.nvim, cell navigation
-    └── insights.lua         # scrollbar
+    ├── neo-tree.lua         # file explorer
+    ├── git.lua              # gitsigns
+    ├── editing.lua          # surround, which-key, tmux navigation
+    ├── ui.lua               # snacks (dashboard/terminal/lazygit/indent), lualine, noice
+    ├── fullstack.lua        # typescript-tools
+    └── markdown.lua         # render-markdown
 ```
 
 ## Languages out of the box
@@ -121,13 +117,12 @@ The ten to learn first:
 | --------------------------- | ----------------------------- |
 | `<leader>ff` / `<leader>fg` | find files / grep project     |
 | `<leader>e`                 | file explorer                 |
-| `-`                         | edit parent directory (oil)   |
 | `gd` / `K`                  | definition / hover docs       |
 | `<leader>ca` / `<leader>rn` | code action / rename          |
 | `<leader>gg`                | LazyGit                       |
 | `<leader>cf`                | format buffer                 |
 | `]d` `[d` / `]e` `[e`       | next/prev diagnostic / error  |
-| `s`                         | flash jump anywhere on screen |
+| `<leader>fk`                | search every keybinding       |
 
 ## Customization
 

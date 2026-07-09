@@ -27,7 +27,6 @@ map("n", "<S-h>", "<cmd>bprevious<CR>", opts)
 -- Movement
 map("n", "j", "gj", opts)
 map("n", "k", "gk", opts)
--- <C-d> / <C-u> owned by neoscroll.nvim for smooth scroll.
 map("n", "n", "nzzzv", opts)
 map("n", "N", "Nzzzv", opts)
 -- <C-h/j/k/l> owned by vim-tmux-navigator (editing.lua): seamless nvim split
@@ -87,15 +86,23 @@ map("n", "]h", "<cmd>Gitsigns next_hunk<CR>", opts)
 map("n", "[h", "<cmd>Gitsigns prev_hunk<CR>", opts)
 
 -- Terminal
-map("n", "<leader>tt", "<cmd>ToggleTerm direction=horizontal<CR>", vim.tbl_extend("force", opts, { desc = "Terminal horizontal" }))
-map("n", "<leader>tf", "<cmd>ToggleTerm direction=float<CR>", vim.tbl_extend("force", opts, { desc = "Terminal float" }))
-map("n", "<leader>tv", "<cmd>ToggleTerm direction=vertical<CR>", vim.tbl_extend("force", opts, { desc = "Terminal vertical" }))
--- <leader>tp (IPython) / <leader>tn (Node) owned by toggleterm (terminal.lua).
+-- Terminals: snacks.terminal. Same toggle per position/command.
+map("n", "<leader>tt", function() Snacks.terminal.toggle(nil, { win = { position = "bottom", height = 18 } }) end, vim.tbl_extend("force", opts, { desc = "Terminal horizontal" }))
+map("n", "<leader>tf", function() Snacks.terminal.toggle(nil, { win = { position = "float", border = "rounded" } }) end, vim.tbl_extend("force", opts, { desc = "Terminal float" }))
+map("n", "<leader>tv", function() Snacks.terminal.toggle(nil, { win = { position = "right", width = 0.4 } }) end, vim.tbl_extend("force", opts, { desc = "Terminal vertical" }))
+map("n", "<leader>tp", function()
+  local cmd = vim.fn.executable("ipython") == 1 and "ipython"
+    or (vim.fn.executable("python3") == 1 and "python3 -m IPython" or "python")
+  Snacks.terminal.toggle(cmd, { win = { position = "bottom", height = 18 } })
+end, vim.tbl_extend("force", opts, { desc = "IPython REPL" }))
+map("n", "<leader>tn", function() Snacks.terminal.toggle("node", { win = { position = "bottom", height = 18 } }) end, vim.tbl_extend("force", opts, { desc = "Node REPL" }))
 map("t", "<Esc>", [[<C-\><C-n>]], opts)
+
+-- Git
+map("n", "<leader>gg", function() Snacks.lazygit() end, vim.tbl_extend("force", opts, { desc = "LazyGit" }))
 
 -- Diagnostics
 map("n", "<leader>xd", vim.diagnostic.open_float, vim.tbl_extend("force", opts, { desc = "Line diagnostics" }))
-map("n", "<leader>xx", "<cmd>Trouble diagnostics toggle<CR>", vim.tbl_extend("force", opts, { desc = "Diagnostics list" }))
 -- float=false: tiny-inline-diagnostic already shows the message at the cursor
 local function diag_jump(count, severity)
   if vim.diagnostic.jump then
@@ -130,5 +137,3 @@ end, vim.tbl_extend("force", opts, { desc = "Yank line diagnostics" }))
 
 -- Misc
 map("n", "<leader>P", "<cmd>QuickLook<CR>", vim.tbl_extend("force", opts, { desc = "Quick Look preview" }))
-map("n", "<leader>u", "<cmd>UndotreeToggle<CR>", vim.tbl_extend("force", opts, { desc = "Undo tree" }))
-map("n", "<leader>z", "<cmd>ZenMode<CR>", vim.tbl_extend("force", opts, { desc = "Zen mode" }))

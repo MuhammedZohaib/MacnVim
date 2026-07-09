@@ -72,9 +72,9 @@ opt.splitbelow = true
 -- Completion
 opt.completeopt = { "menu", "menuone", "noselect" }
 
--- Folding: nvim-ufo owns runtime folding; defaults stay safe before attach.
-opt.foldmethod = "manual"
-opt.foldexpr = ""
+-- Folding: native treesitter folds, everything open by default.
+opt.foldmethod = "expr"
+opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 opt.foldlevel = 99
 opt.foldlevelstart = 99
 opt.foldenable = true
