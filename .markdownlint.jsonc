@@ -1,0 +1,8 @@
+{
+  // Prose lines are not code — don't enforce line length.
+  "MD013": false,
+  // Allow inline HTML (badges, <br>, details blocks in READMEs).
+  "MD033": false,
+  // Don't police table pipe alignment — hand-edited tables drift.
+  "MD060": false
+}
