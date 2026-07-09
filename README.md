@@ -1,36 +1,45 @@
 # Macnvim
 
-A fast, modern Neovim configuration for full-stack development — TypeScript/JavaScript, Python, shell, Docker, Markdown, and Jupyter notebooks. Built on native Neovim APIs (0.11+ LSP, treesitter main branch) with a curated plugin set instead of a kitchen-sink distro.
+A fast, modern Neovim configuration for full-stack development — TypeScript/JavaScript, Python, shell, Docker, Markdown,
+and Jupyter notebooks. Built on native Neovim APIs (0.11+ LSP, treesitter main branch) with a curated plugin set instead
+of a kitchen-sink distro.
 
 ![Neovim 0.11+](https://img.shields.io/badge/Neovim-0.11%2B-57A143?logo=neovim&logoColor=white)
 ![Lua](https://img.shields.io/badge/Made%20with-Lua-2C2D72?logo=lua&logoColor=white)
 
 ## Highlights
 
-- **Native-first**: `vim.lsp.config` / `vim.lsp.enable` (no legacy lspconfig chains), nvim-treesitter main branch, native `gc` commenting
-- **Fast completion**: [blink.cmp](https://github.com/saghen/blink.cmp) + LuaSnip, LSP/snippets/path/buffer sources, cmdline completion
-- **Clean diagnostics**: [tiny-inline-diagnostic](https://github.com/rachartier/tiny-inline-diagnostic.nvim) — boxed message on the cursor line only, wrapped so it never runs off-screen; gutter signs elsewhere
-- **Picker-centric**: [fzf-lua](https://github.com/ibhagwan/fzf-lua) for files/grep/symbols/diagnostics, [neo-tree](https://github.com/nvim-neo-tree/neo-tree.nvim) sidebar + [oil.nvim](https://github.com/stevearc/oil.nvim) for edit-dirs-as-buffers
-- **One UI toolkit**: [snacks.nvim](https://github.com/folke/snacks.nvim) dashboard, notifier, bigfile handling, scratch buffers
+- **Native-first**: `vim.lsp.config` / `vim.lsp.enable` (no legacy lspconfig chains), nvim-treesitter main branch,
+  native `gc` commenting
+- **Fast completion**: [blink.cmp](https://github.com/saghen/blink.cmp) + LuaSnip, LSP/snippets/path/buffer sources,
+  cmdline completion
+- **Clean diagnostics**: [tiny-inline-diagnostic](https://github.com/rachartier/tiny-inline-diagnostic.nvim) — boxed
+  message on the cursor line only, wrapped so it never runs off-screen; gutter signs elsewhere
+- **Picker-centric**: [fzf-lua](https://github.com/ibhagwan/fzf-lua) for files/grep/symbols/diagnostics,
+  [neo-tree](https://github.com/nvim-neo-tree/neo-tree.nvim) sidebar + [oil.nvim](https://github.com/stevearc/oil.nvim)
+  for edit-dirs-as-buffers
+- **One UI toolkit**: [snacks.nvim](https://github.com/folke/snacks.nvim) dashboard, notifier, bigfile handling, scratch
+  buffers
 - **[Kanagawa](https://github.com/rebelot/kanagawa.nvim) Dragon** theme
-- **Format on save**: conform.nvim (prettier/stylua/ruff/shfmt) with project-config-wins fallbacks, nvim-lint (shellcheck/hadolint/markdownlint)
+- **Format on save**: conform.nvim (prettier/stylua/ruff/shfmt) with project-config-wins fallbacks, nvim-lint
+  (shellcheck/hadolint/markdownlint)
 - **Git suite**: gitsigns, diffview, LazyGit, merge-conflict helpers
 - **Jupyter workflow**: `.ipynb` editing via jupytext + iron.nvim REPL + cell navigation
 - **Lazy-loaded**: nearly every plugin loads on demand; startup stays snappy
 
 ## Requirements
 
-| Tool | Why |
-|---|---|
-| Neovim **0.11+** (0.12 recommended) | native LSP API, treesitter main branch |
-| git, curl | plugin installs |
-| [ripgrep](https://github.com/BurntSushi/ripgrep) | live grep, project search |
-| a [Nerd Font](https://www.nerdfonts.com/) | icons everywhere |
-| Node.js + npm | TS/JS language servers |
-| Python 3 + pip | pyright/ruff, Jupyter workflow |
-| make, tree-sitter CLI | parser + native module builds |
-| [lazygit](https://github.com/jesseduffield/lazygit) *(optional)* | `<leader>gg` git TUI |
-| [fd](https://github.com/sharkdp/fd) *(optional)* | faster file finding |
+| Tool                                                             | Why                                    |
+| ---------------------------------------------------------------- | -------------------------------------- |
+| Neovim **0.11+** (0.12 recommended)                              | native LSP API, treesitter main branch |
+| git, curl                                                        | plugin installs                        |
+| [ripgrep](https://github.com/BurntSushi/ripgrep)                 | live grep, project search              |
+| a [Nerd Font](https://www.nerdfonts.com/)                        | icons everywhere                       |
+| Node.js + npm                                                    | TS/JS language servers                 |
+| Python 3 + pip                                                   | pyright/ruff, Jupyter workflow         |
+| make, tree-sitter CLI                                            | parser + native module builds          |
+| [lazygit](https://github.com/jesseduffield/lazygit) _(optional)_ | `<leader>gg` git TUI                   |
+| [fd](https://github.com/sharkdp/fd) _(optional)_                 | faster file finding                    |
 
 macOS one-liner:
 
@@ -39,7 +48,8 @@ brew install neovim ripgrep fd node python tree-sitter lazygit && \
 brew install --cask font-jetbrains-mono-nerd-font
 ```
 
-LSP servers, formatters, and linters are installed automatically through [Mason](https://github.com/williamboman/mason.nvim) on first launch.
+LSP servers, formatters, and linters are installed automatically through
+[Mason](https://github.com/williamboman/mason.nvim) on first launch.
 
 ## Install
 
@@ -57,7 +67,8 @@ git clone https://github.com/MuhammedZohaib/Macnvim.git ~/.config/nvim
 nvim
 ```
 
-lazy.nvim bootstraps itself, installs all plugins, and Mason pulls the language toolchain. Give the first launch a minute, then restart.
+lazy.nvim bootstraps itself, installs all plugins, and Mason pulls the language toolchain. Give the first launch a
+minute, then restart.
 
 **Try it without touching your config** (any Neovim 0.9+):
 
@@ -95,31 +106,35 @@ NVIM_APPNAME=macnvim nvim
 
 ## Languages out of the box
 
-TypeScript/JavaScript (typescript-tools + ESLint), Python (pyright + ruff), Lua, Bash, HTML/CSS/Tailwind, JSON, YAML, Docker/Compose, Markdown. Opening a filetype that needs an uninstalled server prompts a one-key Mason install (Go, Rust, C/C++, Svelte, Vue, Ruby, PHP, Zig, Terraform, Prisma, GraphQL, Elixir, Kotlin, and more).
+TypeScript/JavaScript (typescript-tools + ESLint), Python (pyright + ruff), Lua, Bash, HTML/CSS/Tailwind, JSON, YAML,
+Docker/Compose, Markdown. Opening a filetype that needs an uninstalled server prompts a one-key Mason install (Go, Rust,
+C/C++, Svelte, Vue, Ruby, PHP, Zig, Terraform, Prisma, GraphQL, Elixir, Kotlin, and more).
 
 ## Usage
 
-Leader is **Space**. Press it and pause — which-key shows every binding. Full keymap reference: **[usage.md](./usage.md)**.
+Leader is **Space**. Press it and pause — which-key shows every binding. Full keymap reference:
+**[usage.md](./usage.md)**.
 
 The ten to learn first:
 
-| Key | Action |
-|---|---|
-| `<leader>ff` / `<leader>fg` | find files / grep project |
-| `<leader>e` | file explorer |
-| `-` | edit parent directory (oil) |
-| `gd` / `K` | definition / hover docs |
-| `<leader>ca` / `<leader>rn` | code action / rename |
-| `<leader>gg` | LazyGit |
-| `<leader>cf` | format buffer |
-| `]d` `[d` / `]e` `[e` | next/prev diagnostic / error |
-| `s` | flash jump anywhere on screen |
+| Key                         | Action                        |
+| --------------------------- | ----------------------------- |
+| `<leader>ff` / `<leader>fg` | find files / grep project     |
+| `<leader>e`                 | file explorer                 |
+| `-`                         | edit parent directory (oil)   |
+| `gd` / `K`                  | definition / hover docs       |
+| `<leader>ca` / `<leader>rn` | code action / rename          |
+| `<leader>gg`                | LazyGit                       |
+| `<leader>cf`                | format buffer                 |
+| `]d` `[d` / `]e` `[e`       | next/prev diagnostic / error  |
+| `s`                         | flash jump anywhere on screen |
 
 ## Customization
 
 - Editor behavior: `lua/core/options.lua`
 - Add/remove plugins: drop a spec file in `lua/plugins/` — lazy.nvim picks it up
-- Line length: `colorcolumn`/`textwidth` in `options.lua`, formatter widths in `formatting.lua` (project configs always win)
+- Line length: `colorcolumn`/`textwidth` in `options.lua`, formatter widths in `formatting.lua` (project configs always
+  win)
 - Theme: swap the spec in `lua/plugins/colorscheme.lua`
 
 ## Troubleshooting

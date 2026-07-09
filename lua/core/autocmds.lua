@@ -165,14 +165,16 @@ au("FileType", {
   group = ag("MarkdownSettings", { clear = true }),
   pattern = { "markdown", "gitcommit" },
   callback = function(args)
-    -- Our TS autocmd skips these filetypes, but nvim's runtime
-    -- ftplugin/markdown.lua calls vim.treesitter.start() itself — undo it.
-    pcall(vim.treesitter.stop, args.buf)
-    vim.bo[args.buf].syntax = "markdown"
+    if args.match == "gitcommit" then
+      -- Our TS autocmd skips gitcommit; keep regex syntax there.
+      pcall(vim.treesitter.stop, args.buf)
+      vim.bo[args.buf].syntax = "markdown"
+    end
     vim.opt_local.wrap = true
     vim.opt_local.linebreak = true
-    vim.opt_local.spell = true
-    vim.opt_local.textwidth = 80
+    -- Spell only in commit messages; in markdown it flags every lib name.
+    vim.opt_local.spell = args.match == "gitcommit"
+    vim.opt_local.textwidth = 120
   end,
 })
 

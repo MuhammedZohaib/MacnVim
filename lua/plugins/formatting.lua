@@ -86,12 +86,23 @@ return {
               return vim.fn.executable("prettierd") == 1
             end,
             cwd = util.root_file(prettier_roots),
+            -- Used only when prettierd resolves no project config:
+            -- 120-col lines + hard-wrap markdown prose on save.
+            env = {
+              PRETTIERD_DEFAULT_CONFIG = vim.fn.stdpath("config") .. "/prettier-fallback.json",
+            },
           },
           prettier = {
             condition = function()
               return vim.fn.executable("prettierd") == 0 and vim.fn.executable("prettier") == 1
             end,
             cwd = util.root_file(prettier_roots),
+            prepend_args = function(_, ctx)
+              if has_project_config(ctx, prettier_roots) then
+                return {}
+              end
+              return { "--print-width", "120", "--prose-wrap", "always" }
+            end,
           },
           stylua = {
             -- Match editor default (stylua's own default is also 120).

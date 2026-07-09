@@ -26,7 +26,6 @@ local ensure_installed = {
 
 -- Filetypes where treesitter highlighting stays off (regex syntax instead).
 local highlight_skip = {
-  markdown = true,
   gitcommit = true,
 }
 
