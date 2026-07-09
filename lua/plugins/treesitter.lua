@@ -69,14 +69,14 @@ return {
           if not indent_skip[ft] then
             vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
           end
-          -- Folding stays owned by nvim-ufo; no foldexpr here.
+          -- Folding: global foldexpr in core/options.lua (native treesitter).
         end,
       })
     end,
   },
 
   {
-    -- Move-only: select textobjects (af/if/ac/ic/aa/ia) are owned by mini.ai.
+    -- Move-only textobjects (]f/[f/]c/[c function and class jumps).
     "nvim-treesitter/nvim-treesitter-textobjects",
     branch = "main",
     keys = {

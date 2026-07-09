@@ -17,48 +17,39 @@ Leader = **Space**. Localleader = **\\**. Press `<Space>` and pause — which-ke
 | `<leader>fd` | Workspace diagnostics                    |
 | `<leader>fs` | Document symbols                         |
 | `<leader>fS` | Workspace symbols                        |
-| `<leader>ft` | Todo comments                            |
-| `<leader>S`  | Search/replace project-wide (grug-far)   |
-| `<leader>sw` | Replace word under cursor (grug-far)     |
+
+Project-wide replace: `<leader>fg` the term, send to quickfix (`ctrl-q` in the picker), then `:cdo s/old/new/g | update`.
 
 ## Motion & Jumping
 
-| Key                | Action                                                |
-| ------------------ | ----------------------------------------------------- |
-| `s`                | **Flash jump** — 2-char label jump anywhere on screen |
-| `S`                | Flash treesitter node jump                            |
-| `<C-d>` / `<C-u>`  | Smooth half-page scroll (neoscroll)                   |
-| `<C-f>` / `<C-b>`  | Smooth full-page scroll                               |
-| `zz` / `zt` / `zb` | Smooth center / top / bottom recenter                 |
-| `j` / `k`          | Down/up by visual line (wrapping-safe)                |
-| `n` / `N`          | Next/prev search result, centered                     |
-| `[d` / `]d`        | Prev/next diagnostic                                  |
-| `[e` / `]e`        | Prev/next **error** (skips warnings)                  |
-| `[h` / `]h`        | Prev/next git hunk                                    |
-| `[t` / `]t`        | Prev/next TODO comment                                |
-| `[a` / `]a`        | Prev/next symbol (aerial)                             |
-| `[f` / `]f`        | Prev/next function (treesitter)                       |
-| `[c` / `]c`        | Prev/next class (treesitter)                          |
+| Key         | Action                                 |
+| ----------- | -------------------------------------- |
+| `j` / `k`   | Down/up by visual line (wrapping-safe) |
+| `n` / `N`   | Next/prev search result, centered      |
+| `[d` / `]d` | Prev/next diagnostic                   |
+| `[e` / `]e` | Prev/next **error** (skips warnings)   |
+| `[h` / `]h` | Prev/next git hunk                     |
+| `[f` / `]f` | Prev/next function (treesitter)        |
+| `[c` / `]c` | Prev/next class (treesitter)           |
 
 ## Windows & Buffers
 
-| Key                                     | Action                       |
-| --------------------------------------- | ---------------------------- |
+| Key                                     | Action                               |
+| --------------------------------------- | ------------------------------------ |
 | `<C-h/j/k/l>`                           | Move between splits (and tmux panes) |
-| `<C-Up/Down/Left/Right>`                | Resize split                 |
-| `<leader>sv` / `<leader>sh`             | Vertical / horizontal split  |
-| `<S-l>` / `<S-h>`                       | Next / prev buffer           |
-| `<leader>bd`                            | Close buffer                 |
-| `<leader>bo`                            | Close all other buffers      |
-| `<leader>w` / `<leader>q` / `<leader>Q` | Save / quit / force quit all |
+| `<C-Up/Down/Left/Right>`                | Resize split                         |
+| `<leader>sv` / `<leader>sh`             | Vertical / horizontal split          |
+| `<S-l>` / `<S-h>`                       | Next / prev buffer                   |
+| `<leader>bd`                            | Close buffer                         |
+| `<leader>bo`                            | Close all other buffers              |
+| `<leader>w` / `<leader>q` / `<leader>Q` | Save / quit / force quit all         |
 
-## File Explorer
+## File Explorer (neo-tree)
 
 | Key                                   | Action                           |
 | ------------------------------------- | -------------------------------- |
-| `<leader>e`                           | Toggle neo-tree                  |
-| `<leader>o`                           | Focus neo-tree                   |
-| `-`                                   | **Oil** — edit parent dir as a buffer (rename/delete files like text, `:w` applies) |
+| `<leader>e`                           | Toggle explorer                  |
+| `<leader>o`                           | Focus explorer                   |
 | Inside tree: `l` / `h` / `<CR>` / `/` | Open / close / open / fuzzy find |
 
 ## LSP (active when a language server attaches)
@@ -87,144 +78,86 @@ Leader = **Space**. Localleader = **\\**. Press `<Space>` and pause — which-ke
 | `<leader>tsf` | Fix all auto-fixes      |
 | `<leader>tsd` | Go to source definition |
 
-## Diagnostics & Outline
+## Diagnostics
 
 Diagnostics render as a boxed message on the cursor line (tiny-inline-diagnostic); other lines show gutter signs only.
 
-| Key          | Action                                 |
-| ------------ | -------------------------------------- |
+| Key          | Action                                                                   |
+| ------------ | ------------------------------------------------------------------------ |
 | `<leader>xd` | Line diagnostics float (focusable — press again to enter, yank from it) |
-| `<leader>xy` | **Yank diagnostics on current line to clipboard** |
-| `<leader>xx` | Toggle Trouble panel (all diagnostics) |
-| `<leader>xX` | Buffer diagnostics (Trouble)           |
-| `<leader>xs` | Trouble symbols                        |
-| `<leader>xl` | Trouble LSP                            |
-| `<leader>xq` | Trouble quickfix                       |
-| `<leader>a`  | Toggle code outline (aerial)           |
+| `<leader>xy` | **Yank diagnostics on current line to clipboard**                        |
+| `<leader>fd` | Workspace diagnostics picker (fzf)                                       |
 
 ## Format & Code
 
-| Key          | Action                         |
-| ------------ | ------------------------------ |
-| `<leader>cf` | Format buffer (conform)        |
-| `<leader>cF` | Force format with LSP fallback |
-| `gcc` / `gc` | Comment line / selection (native) |
+| Key          | Action                                           |
+| ------------ | ------------------------------------------------ |
+| `<leader>cf` | Format buffer (conform)                          |
+| `<leader>cF` | Force format with LSP fallback                   |
+| `gcc` / `gc` | Comment line / selection (native)                |
+| `zR` / `zM`  | Open / close all folds (native treesitter folds) |
 
-Format-on-save is enabled (2.5s timeout, skips huge files). Project formatter configs (`.prettierrc`, `stylua.toml`, `ruff.toml`, ...) always win over the editor defaults.
+Format-on-save is enabled (2.5s timeout, skips huge files). Project formatter configs (`.prettierrc`, `stylua.toml`, `ruff.toml`, ...) always win over the editor defaults (120 columns, markdown prose hard-wrapped).
 
 ## Git
 
-| Key                         | Action                      |
-| --------------------------- | --------------------------- |
-| `<leader>gg`                | **LazyGit** (full TUI)      |
-| `<leader>gp`                | Preview hunk                |
-| `<leader>gb` / `<leader>gB` | Blame line / toggle blame   |
-| `<leader>gs` (visual)       | Stage hunk                  |
-| `<leader>gr` (visual)       | Reset hunk                  |
-| `<leader>gS` / `<leader>gR` | Stage / reset buffer        |
-| `<leader>gu`                | Undo stage hunk             |
-| `<leader>gd`                | Diffview (side-by-side)     |
-| `<leader>gh` / `<leader>gH` | File history / repo history |
-| `<leader>gc`                | Close diffview              |
-| `<leader>gD`                | Diff this file              |
+| Key                         | Action                              |
+| --------------------------- | ----------------------------------- |
+| `<leader>gg`                | **LazyGit** (full TUI, snacks float) |
+| `<leader>gp`                | Preview hunk                        |
+| `<leader>gb` / `<leader>gB` | Blame line / toggle blame           |
+| `<leader>gs` (visual)       | Stage hunk                          |
+| `<leader>gr` (visual)       | Reset hunk                          |
+| `<leader>gS` / `<leader>gR` | Stage / reset buffer                |
+| `<leader>gu`                | Undo stage hunk                     |
+| `<leader>gD`                | Diff this file (gitsigns)           |
 
-## Terminal & REPLs
+Diffs, history, and merge conflicts: use LazyGit (`<leader>gg`) — it covers side-by-side diffs, file history, and conflict resolution.
+
+## Terminal & REPLs (snacks.terminal)
 
 | Key                                        | Action                                 |
 | ------------------------------------------ | -------------------------------------- |
-| `<leader>tt` / `<leader>tv` / `<leader>tf` | Terminal horizontal / vertical / float |
+| `<leader>tt` / `<leader>tv` / `<leader>tf` | Terminal bottom / right / float        |
 | `<leader>tp`                               | IPython REPL                           |
 | `<leader>tn`                               | Node REPL                              |
 | `<Esc>` (inside terminal)                  | Exit terminal mode                     |
 
-## Jupyter (.ipynb via jupytext, `# %%` cells)
+## UI, Misc
 
-| Key                         | Action                    |
-| --------------------------- | ------------------------- |
-| `]j` / `[j`                 | Next / previous cell      |
-| `<leader>jx`                | Run cell                  |
-| `<leader>jj`                | Run cell and move         |
-| `<leader>ja` / `<leader>jb` | Run all / cells below     |
-| `<leader>jo` / `<leader>jO` | Add cell below / above    |
-| `<leader>jr` / `<leader>js` | REPL open / send (iron)   |
-
-## Harpoon (quick file switching)
-
-| Key                         | Action                      |
-| --------------------------- | --------------------------- |
-| `<leader>ha`                | Add current file to harpoon |
-| `<leader>hh`                | Open harpoon menu           |
-| `<leader>1..4`              | Jump to harpoon slot 1–4    |
-| `<leader>hp` / `<leader>hn` | Prev / next harpoon         |
-
-## HTTP Client (kulala, `.http` files)
-
-| Key                         | Action                        |
-| --------------------------- | ----------------------------- |
-| `<leader>rr`                | Run request under cursor      |
-| `<leader>ra`                | Run all requests in file      |
-| `<leader>rp` / `<leader>rn` | Prev / next request           |
-
-## package.json (when editing it)
-
-| Key                                        | Action                       |
-| ------------------------------------------ | ---------------------------- |
-| `<leader>ns` / `<leader>nh`                | Show / hide package versions |
-| `<leader>nu` / `<leader>ni` / `<leader>nd` | Update / install / delete    |
-| `<leader>nv`                               | Change package version       |
-
-## Sessions, UI, Misc
-
-| Key                  | Action                                    |
-| -------------------- | ----------------------------------------- |
-| `<leader>ps`         | Restore session for cwd                   |
-| `<leader>pl`         | Restore last session                      |
-| `<leader>pd`         | Stop session saving                       |
-| `<leader>.`          | Scratch buffer (snacks)                   |
-| `<leader>f.`         | Pick scratch buffer                       |
-| `<leader>u`          | Undo tree                                 |
-| `<leader>z`          | Zen mode (distraction-free)               |
-| `<Esc>`              | Clear search highlight                    |
-| `<A-j>` / `<A-k>`    | Move line down / up (works in visual too) |
-| `<` / `>` (visual)   | Indent / outdent, stay in selection       |
-| `zR` / `zM`          | Open / close all folds (ufo)              |
+| Key                | Action                                    |
+| ------------------ | ----------------------------------------- |
+| `<leader>.`        | Scratch buffer (snacks)                   |
+| `<leader>f.`       | Pick scratch buffer                       |
+| `<Esc>`            | Clear search highlight                    |
+| `<A-j>` / `<A-k>`  | Move line down / up (works in visual too) |
+| `<` / `>` (visual) | Indent / outdent, stay in selection       |
 
 ## Completion (insert mode, blink.cmp)
 
-| Key             | Action                          |
-| --------------- | ------------------------------- |
-| `<C-Space>`     | Trigger completion menu         |
-| `<C-j>` / `<C-k>` | Next / previous item          |
-| `<CR>`          | Confirm                         |
-| `<Tab>` / `<S-Tab>` | Select next / snippet jump  |
-| `<C-e>`         | Dismiss                         |
-| `<C-b>` / `<C-f>` | Scroll docs                   |
+| Key                 | Action                     |
+| ------------------- | -------------------------- |
+| `<C-Space>`         | Trigger completion menu    |
+| `<C-j>` / `<C-k>`   | Next / previous item       |
+| `<CR>`              | Confirm                    |
+| `<Tab>` / `<S-Tab>` | Select next / snippet jump |
+| `<C-e>`             | Dismiss                    |
+| `<C-b>` / `<C-f>`   | Scroll docs                |
 
 Cmdline (`:`, `/`, `?`) completes too — same keys.
 
-## Text Objects (visual/operator, mini.ai + treesitter)
+## Surround (nvim-surround)
 
-Type these after `d/c/y/v`:
-
-| Object      | Meaning                        |
-| ----------- | ------------------------------ |
-| `af` / `if` | A function / inside function   |
-| `ac` / `ic` | A class / inside class         |
-| `aa` / `ia` | A parameter / inside parameter |
-| `ao` / `io` | A block/cond/loop / inside     |
-| `aq` / `iq` | Quote (any) / inside           |
-| `ab` / `ib` | Bracket / inside               |
-
-**Surround** (nvim-surround): `ys{motion}{char}` add, `ds{char}` delete, `cs{old}{new}` change. Example: `ysiw"` wrap word in quotes.
+`ys{motion}{char}` add, `ds{char}` delete, `cs{old}{new}` change. Example: `ysiw"` wraps the word in quotes.
 
 ## Plugins / Health
 
-| Command          | Action                               |
-| ---------------- | ------------------------------------ |
-| `:Lazy`          | Plugin manager                       |
-| `:Mason`         | Install LSPs/formatters              |
-| `:checkhealth`   | Full health report                   |
-| `:ConformInfo`   | Formatter status for current buffer  |
+| Command        | Action                              |
+| -------------- | ----------------------------------- |
+| `:Lazy`        | Plugin manager                      |
+| `:Mason`       | Install LSPs/formatters             |
+| `:checkhealth` | Full health report                  |
+| `:ConformInfo` | Formatter status for current buffer |
 
 ---
 
@@ -232,7 +165,7 @@ Type these after `d/c/y/v`:
 
 1. `<leader>ff` — find files
 2. `<leader>fg` — grep project
-3. `<leader>e` — explorer (`-` for oil)
+3. `<leader>e` — explorer
 4. `<leader>gg` — LazyGit
 5. `<leader>cf` — format
 6. `<leader>ca` — code action

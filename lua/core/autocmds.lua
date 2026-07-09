@@ -121,9 +121,20 @@ au("VimEnter", {
 
 au("FileType", {
   group = ag("QuickClose", { clear = true }),
-  pattern = { "help", "qf", "lspinfo", "man", "snacks_notif", "grug-far", "checkhealth", "startuptime" },
+  pattern = { "help", "qf", "lspinfo", "man", "snacks_notif", "checkhealth", "startuptime" },
   callback = function(event)
     vim.keymap.set("n", "q", "<cmd>q<CR>", { buffer = event.buf, silent = true })
+  end,
+})
+
+-- The global terminal-mode <Esc> remap (keymaps.lua) would trap lazygit.
+-- Let <Esc> reach lazygit so it navigates/quits normally.
+au("TermOpen", {
+  group = ag("LazyGitEsc", { clear = true }),
+  callback = function(args)
+    if vim.api.nvim_buf_get_name(args.buf):match("lazygit") then
+      vim.keymap.set("t", "<Esc>", "<Esc>", { buffer = args.buf, desc = "Pass Esc to lazygit" })
+    end
   end,
 })
 
